@@ -22,7 +22,7 @@ line ::= label [ comment ] "\n"
 label ::= label_name ":"
 
 instr ::= op0
-        | op1 register, (address | integer | char)
+        | op1 register, (register, address | integer | char)
         | op2 register, register, rigister
         | op3 label_name
         | op4 register
@@ -32,7 +32,8 @@ op0 ::= "halt"
       | "ret"
 
 op1 ::= "store"
-      | "load"
+      | "ld"
+      | "li"
 
 op2 ::= "add"
       | "sub"
@@ -124,7 +125,7 @@ jmp label   ; --> `jmp 123`, где 123 - номер инструкции пос
             "index": "cmd_addr",
             "opcode": "command",
             "args": [
-                  "reg", "reg", "reg", "addr | int | char"
+                  "reg", "reg", "reg", "addr | int | char", "arg"
             ]
       }
 ]

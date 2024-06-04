@@ -4,8 +4,8 @@ import json
 MEMORY_SIZE = 1024
 MAX_NUMBER = 1 << 31 - 1
 MIN_NUMBER = -(1 << 31)
-INPUT_PORT_ADDRESS = 0
-OUTPUT_PORT_ADDRESS = 1
+INPUT_PORT_ADDRESS = 1
+OUTPUT_PORT_ADDRESS = 2
 
 def write_code(filename: str, code: str):
     with open(filename, mode="bw") as f:

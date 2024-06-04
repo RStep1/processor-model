@@ -1,5 +1,5 @@
 from enum import Enum
-from isa import MEMORY_SIZE
+from isa import MEMORY_SIZE, Opcode
 
 REGISTER_AMOUNT = 4
 INSTRUCTION_LIMIT = 2000
@@ -26,3 +26,19 @@ class Register(Enum):
 
     def __str__(self):
         return f"{self.reg_name}={self.reg_value}"
+    
+    INSTRUCTION_LIMIT = 1500
+
+ALU_OPCODE_BINARY_HANDLERS = {
+    Opcode.ADD: lambda left, right: int(left + right),
+    Opcode.SUB: lambda left, right: int(left - right),
+    Opcode.MUL: lambda left, right: int(left * right),
+    Opcode.DIV: lambda left, right: int(left / right),
+    Opcode.MOD: lambda left, right: int(left % right),
+    Opcode.CMP: lambda left, right: int(left - right),
+}
+
+ALU_OPCODE_SINGLE_HANDLERS = {
+    Opcode.INC: lambda left: left + 1,
+    Opcode.DEC: lambda left: left - 1,
+}

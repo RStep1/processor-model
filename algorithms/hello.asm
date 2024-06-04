@@ -3,11 +3,13 @@ section .data:
     ptr: greeting
 
 section .text:
+    .start:
+        li r1, ptr ; save address of first character in string
     .loop:
-        load r0, ptr
-        jz .end
+        load r0, r1 ; get character by address in register
+        jz .end ; if it's 0-terminator, finish the programm
         output r0
-        inc ptr
+        inc r1
         jmp .loop
     .end:
         halt

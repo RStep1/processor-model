@@ -247,7 +247,7 @@ def main(source, target):
     code = translate(source)
 
     write_code(target, code)
-    print("source LoC:", len(source.split("\n")), "code instr:", len(code))
+    print("source LoC:", len(source.split("\n")), "code instr:", len(code.split("{")) - 1)
 
 
 if __name__ == "__main__":

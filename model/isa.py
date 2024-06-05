@@ -48,18 +48,3 @@ class Opcode(str, Enum):
         return str(self.value)
 
 
-class Command:
-    def __init__(self, opcode: Opcode, operand=None):
-        self.opcode = opcode
-        self.operand = operand
-    
-def read_opcode(filename):
-    '''
-    Read machine code from file
-    '''
-
-def write_opcode(filename):
-    ''' 
-    Write machinde code into file
-    '''
-

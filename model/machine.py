@@ -26,8 +26,6 @@ class Register(Enum):
 
     def __str__(self):
         return f"{self.reg_name}={self.reg_value}"
-    
-    INSTRUCTION_LIMIT = 1500
 
 ALU_OPCODE_BINARY_HANDLERS = {
     Opcode.ADD: lambda left, right: int(left + right),

@@ -30,6 +30,8 @@ section .text:
     .sum_if_even:
         li r5, DIVIDER
         mod r3, r1, r5 ; check if r3 % 2
+        li r6, 0
+        cmp r3, r6 ; r3 == 0 ?
         jnz .quit ;if no - skip operation
         add r4, r4, r1 ; if yes - update sum
     .quit:

@@ -5,8 +5,10 @@ section .data:
 section .text:
     .start:
         li r1, ptr ; save address of first character in string
+        li r2, 0 ; for comparation
     .loop:
         load r0, r1 ; get character by address in register
+        cmp r0, r2
         jz .end ; if it's 0-terminator, finish the programm
         output r0
         inc r1

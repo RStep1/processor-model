@@ -25,8 +25,10 @@ section .text:
 
     .input_username:
         li r1, username_ptr
+        li r2, 0 ; for comparation
         .loop2:
             input r0
+            cmp r0, r2
             jz .end_input
             store r0, r1
             inc r1
@@ -35,9 +37,11 @@ section .text:
             ret
 
     .print_string: ; r1 - pointer on str
+        li r2, 0 ; for comparation
         .loop:
             ld r0, r1
             output r0
+            cmp r0, r2
             jz .end
             inc r1
             jmp .loop

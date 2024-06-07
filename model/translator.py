@@ -226,8 +226,8 @@ def translate(source):
 
     variables, section_text_address = translate_section_data(section_data)
 
-    for name, value in variables.items():
-        print(f"{name}={value.data}")
+    # for name, value in variables.items():
+    #     print(f"{name}={value.data}")
 
     labels, code = translate_section_text_stage_1(section_text, section_text_address)
     code = translate_section_text_stage_2(labels, variables, code)

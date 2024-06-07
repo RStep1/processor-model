@@ -40,3 +40,19 @@ ALU_OPCODE_SINGLE_HANDLERS = {
     Opcode.INC: lambda left: left + 1,
     Opcode.DEC: lambda left: left - 1,
 }
+
+class DataPath:
+    pass
+
+class ALU:
+    z_flag = None
+
+    def __init__(self):
+        self.z_flag = 0
+    
+    def process(self, left: int, right: int, opcode: Opcode) -> int:
+        pass
+    
+
+class ControlUnit:
+    pass

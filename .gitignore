@@ -162,3 +162,4 @@ cython_debug/
 codes/
 Makefile
 algorithms/test_all_commands.asm
+.vscode/

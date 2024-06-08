@@ -157,8 +157,8 @@ def is_string(value: str) -> bool:
 
 def translate_section_data(section_data):
     variables = {
-        "in": Variable("in", INPUT_PORT_ADDRESS, [0], False),
-        "out": Variable("out", OUTPUT_PORT_ADDRESS, [0], False),
+        "in": Variable("in", INPUT_PORT_ADDRESS, [0]),
+        "out": Variable("out", OUTPUT_PORT_ADDRESS, [0]),
     }
     reference_variables = {}
     address = 3
@@ -170,21 +170,21 @@ def translate_section_data(section_data):
     def handle_integer(name, value):
         value = int(value)
         assert MIN_NUMBER <= value <= MAX_NUMBER, f"Value {value} is out of bound"
-        variables[name] = Variable(name, address, [value], False)
+        variables[name] = Variable(name, address, [value])
         return 1
 
     def handle_string(name, value):
         chars = [ord(char) for char in value[1:-1]] + [0]
-        variables[name] = Variable(name, address, chars, True)
+        variables[name] = Variable(name, address, chars)
         return len(chars)
 
     def handle_buffer(name, value):
         size = int(value.split(" ", 1)[1])
-        variables[name] = Variable(name, address, [0] * size, False)
+        variables[name] = Variable(name, address, [0] * size)
         return size
 
     def handle_reference(name, value):
-        variables[name] = Variable(name, address, [0], False)
+        variables[name] = Variable(name, address, [0])
         reference_variables[name] = value
         return 1
 

@@ -1,7 +1,8 @@
 from enum import Enum
-from isa import MEMORY_SIZE, Opcode
+from isa import MEMORY_SIZE, Opcode, read_code
+import logging, sys
 
-REGISTER_AMOUNT = 4
+REGISTER_AMOUNT = 8
 INSTRUCTION_LIMIT = 2000
 
 class Register(Enum):
@@ -13,7 +14,6 @@ class Register(Enum):
     R5 = (0, "r5")
     R6 = (0, "r6")
     R7 = (0, "r7")
-    R8 = (0, "r8")
     
     IP = (0, "ip")
     SP = (MEMORY_SIZE - 1, "sp")
@@ -55,4 +55,51 @@ class ALU:
     
 
 class ControlUnit:
+    program = None
+
     pass
+
+def simualtion(code, input_tokens):
+    data_path = DataPath(code)
+    control_unit = ControlUnit(data_path)
+    instr_counter = 0
+
+    logging.debug("%s", control_unit)
+    try:
+        while instr_counter < INSTRUCTION_LIMIT:
+            control_unit.decode_and_execute_instruction()
+            instr_counter += 1
+            logging.debug("%s", control_unit)
+    except EOFError:
+        logging.warning("Input buffer is empty!")
+    except StopIteration:
+        pass
+
+    if instr_counter >= INSTRUCTION_LIMIT:
+        logging.warning("Limit exceeded!")
+    logging.info("output_buffer: %s", repr("".join(data_path.output_buffer)))
+    return "".join(data_path.output_buffer), instr_counter, control_unit.current_tick()
+
+def main(code_file, input_file):
+    code = read_code(code_file)
+    with open(input_file, encoding="utf-8") as file:
+        input_text = file.read()
+        input_token = []
+        for char in input_text:
+            input_token.append(char)
+
+    output, instr_counter = simulation(
+        code,
+        input_tokens=input_token,
+        limit=INSTRUCTION_LIMIT,
+    )
+
+    print("".join(output))
+    print("instr_counter: ", instr_counter)
+
+
+if __name__ == "__main__":
+    logging.getLogger().setLevel(logging.DEBUG)
+    assert len(sys.argv) == 3, "Wrong arguments: machine.py <code_file> <input_file>"
+    _, code_file, input_file = sys.argv
+    main(code_file, input_file)

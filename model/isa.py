@@ -11,13 +11,17 @@ def write_code(filename: str, code: str):
     with open(filename, mode="bw") as f:
         f.write(code.encode("utf-8"))
 
+def read_code(filename):
+    with open(filename, mode="rb") as f:
+        code = f.read()
+        code = str(code, encoding="utf-8").splitlines()
+        return list(code)
+
 class Variable:
-    def __init__(self, name, address, data, is_string):
+    def __init__(self, name, address, data):
         self.name = name
         self.address = address
         self.data = data
-        self.is_string = is_string
-
 class Opcode(str, Enum):
     INC = "inc"
     DEC = "dec"
@@ -35,16 +39,12 @@ class Opcode(str, Enum):
     JZ = "jz"
     JNZ = "jnz"
     CMP = "cmp"
-    ASL = "asl"
     HALT = "halt"
     MOV = "mov"
     CALL = "call"
     RET = "ret"
     PUSH = "push"
     POP = "pop"
-    
 
     def __str__(self):
         return str(self.value)
-
-

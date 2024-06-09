@@ -32,7 +32,7 @@ def clean_source(source: str) -> str:
     return "\n".join(lines)
 
 def is_jump_command(command):
-    return command in [Opcode.JMP, Opcode.JZ, Opcode.JNZ]
+    return command in [Opcode.JMP, Opcode.JZ, Opcode.JNZ, Opcode.JNN]
 
 def remove_commas(args):
     new_args = []
@@ -89,7 +89,7 @@ def translate_section_text_stage_1(section_text, address):
                 pass #do some checks
             code.append(build_json_instruction(address, command, command_args))
             address+=1
-        elif len(command_args) == 1: #jmp, jz, jnz or op4
+        elif len(command_args) == 1: #jmp, jz, jnz, jnn or op4
             opcode = Opcode(command)
             if opcode == Opcode.CALL:
                 code.append(build_json_instruction(address, Opcode.DEC.value, [Register.SP.reg_name]))

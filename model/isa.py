@@ -38,6 +38,7 @@ class Opcode(str, Enum):
     JMP = "jmp"
     JZ = "jz"
     JNZ = "jnz"
+    JNN = "jnn"
     CMP = "cmp"
     HALT = "halt"
     MOV = "mov"

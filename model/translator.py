@@ -143,9 +143,9 @@ def translate_section_text_stage_2(labels, variables, code):
         if fourth_arg is None:
             continue
         if fourth_arg.startswith("."):
-            instruction["args"][3] = labels[fourth_arg]
+            instruction["args"][3] = str(labels[fourth_arg])
         elif fourth_arg in variables.keys():
-            instruction["args"][3] = variables[fourth_arg].data[0]
+            instruction["args"][3] = str(variables[fourth_arg].data[0])
         code[index] = instruction
     return code
 

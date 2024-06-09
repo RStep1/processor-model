@@ -233,7 +233,6 @@ def translate_section_data(section_data):
     return variables, address
 
 def translate(source):
-    source = clean_source(source)
     section_data_index = source.find(SECTION_DATA)
     section_text_index = source.find(SECTION_TEXT)
     section_data = source[section_data_index + len(SECTION_DATA) + 1 : section_text_index]
@@ -256,17 +255,18 @@ def translate(source):
 
     json_code = json.dumps(code, indent=4)
 
-    return json_code
+    return json_code, section_text_address
 
 
 def main(source, target):
     with open(source, encoding="utf-8") as f:
         source = f.read()
 
-    code = translate(source)
+    source = clean_source(source)
+    code, section_text_address = translate(source)
 
     write_code(target, code)
-    print("source LoC:", len(source.split("\n")), "code instr:", len(code.split("{")) - 1)
+    print("source LoC:", len(source.split("\n")), "code instr:", len(code.split("{")) - section_text_address)
 
 
 if __name__ == "__main__":

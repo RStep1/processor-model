@@ -40,6 +40,10 @@ def remove_commas(args):
         new_args.append(arg.rstrip(","))
     return new_args
 
+def build_json_data(address, var_name, data):
+    args = data
+    return {"index": address, "name": var_name, "args": args}
+
 def build_json_instruction(address, command, command_args):
     args = [None, None, None, None]
     if len(command_args) == 1:
@@ -57,16 +61,26 @@ def build_json_instruction(address, command, command_args):
         for i in range(3):
             args[i] = command_args[i]
 
-    #return f'{{"index": {address}, "opcode": "{command}", "args": {args}}}'
-    return {"index": address, "opcode": command, "args": args}
+    #return f'{{"index": {address}, "name": "{command}", "args": {args}}}'
+    return {"index": address, "name": command, "args": args}
 
-def translate_section_text_stage_1(section_text, address):
-    code = []
+def translate_variables(variables, code):
+    for var_name, variable in variables.items():
+        # if var_name in ["in", "out"]:
+            # code.append(build_json_data(variable.address, var_name + "_port", variable.data))
+        if len(variable.data) > 1: # это строка
+            address = variable.address
+            for cell in variable.data:
+                code.append(build_json_data(address, variable.name, [cell]))
+                address += 1
+        else: # другие переменные
+            code.append(build_json_data(variable.address, variable.name, variable.data))
+    return code
+
+def translate_section_text_stage_1(section_text, address, code):
     labels = {}
 
-    code.append(build_json_instruction(0, Opcode.JMP.value, [START_LABEL])) #add jmp insturction on programm beginning
-
-    for line_num, token in enumerate(section_text.splitlines(), 1):
+    for _, token in enumerate(section_text.splitlines(), 1):
         token_args = token.split()
         command = token_args[0]
         command_args = token_args[1:]
@@ -134,11 +148,12 @@ def translate_section_text_stage_1(section_text, address):
 
     return labels, code
 
-
-def translate_section_text_stage_2(labels, variables, code):
-    # list(dict("index": integer, "opcode": Opcode, "args": list))
+def translate_section_text_stage_2(labels, variables, code, section_text_address):
+    # list(dict("index": integer, "name": Opcode, "args": list))
     for index, instruction in enumerate(code):
-        # print(f"{instruction["index"], instruction["opcode"], instruction["args"]}")
+        if index < section_text_address: # пропускаем секцию .data
+            continue
+        # print(f"{instruction["index"], instruction["name"], instruction["args"]}")
         fourth_arg = instruction["args"][3]
         if fourth_arg is None:
             continue
@@ -157,8 +172,8 @@ def is_string(value: str) -> bool:
 
 def translate_section_data(section_data):
     variables = {
-        "in": Variable("in", INPUT_PORT_ADDRESS, [0]),
-        "out": Variable("out", OUTPUT_PORT_ADDRESS, [0]),
+        "in": Variable("input_port", INPUT_PORT_ADDRESS, [0]),
+        "out": Variable("output_port", OUTPUT_PORT_ADDRESS, [0]),
     }
     reference_variables = {}
     address = 3
@@ -229,8 +244,12 @@ def translate(source):
     # for name, value in variables.items():
     #     print(f"{name}={value.data}")
 
-    labels, code = translate_section_text_stage_1(section_text, section_text_address)
-    code = translate_section_text_stage_2(labels, variables, code)
+    code = []
+    code.append(build_json_instruction(0, Opcode.JMP.value, [START_LABEL])) #add jmp instruction on program beginning
+
+    code = translate_variables(variables, code)
+    labels, code = translate_section_text_stage_1(section_text, section_text_address, code)
+    code = translate_section_text_stage_2(labels, variables, code, section_text_address)
     
     for line in code:
         print(line)

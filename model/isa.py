@@ -1,5 +1,4 @@
 from enum import Enum
-import json
 
 MEMORY_SIZE = 1024
 MAX_NUMBER = 1 << 31 - 1
@@ -22,6 +21,7 @@ class Variable:
         self.name = name
         self.address = address
         self.data = data
+
 class Opcode(str, Enum):
     INC = "inc"
     DEC = "dec"

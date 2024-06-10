@@ -95,7 +95,7 @@ def translate_section_text_stage_1(section_text, address, code):
             for arg in command_args:
                 if not is_register(arg):
                     is_all_regs = False
-            assert is_all_regs == True, "Arithmetic commands only can take registers as argumens"
+            assert is_all_regs == True, "Arithmetic commands only can take registers as arguments"
             code.append(build_json_instruction(address, command, command_args))
             address+=1
         elif len(command_args) == 2: #store, load or cmp, move
@@ -110,7 +110,7 @@ def translate_section_text_stage_1(section_text, address, code):
                 address+=1
                 code.append(build_json_instruction(address, Opcode.ST.value, [Register.IP.reg_name, Register.SP.reg_name]))
                 address+=1
-                code.append(build_json_instruction(address, Opcode.LI.value, [Register.IP.reg_name, command_args[0]]))
+                code.append(build_json_instruction(address, Opcode.JMP.value, [command_args[0]]))
                 address+=1
                 # dec sp
                 # st ip, sp 
@@ -151,7 +151,7 @@ def translate_section_text_stage_1(section_text, address, code):
 def translate_section_text_stage_2(labels, variables, code, section_text_address):
     # list(dict("index": integer, "name": Opcode, "args": list))
     for index, instruction in enumerate(code):
-        if index < section_text_address: # пропускаем секцию .data
+        if index > 0 and index < section_text_address: # пропускаем секцию .data
             continue
         # print(f"{instruction["index"], instruction["name"], instruction["args"]}")
         fourth_arg = instruction["args"][3]

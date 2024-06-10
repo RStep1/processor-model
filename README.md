@@ -212,7 +212,7 @@ jmp label   ; --> `jmp 123`, где 123 - номер инструкции пос
 - `call .subroutine` -> 
   1. `dec sp`
   2. `st ip, sp`
-  3. `li ip, .subroutine`
+  3. `jmp .subroutine`
 - `ret` ->
   1. `ld ip, sp`
   2. `inc sp`

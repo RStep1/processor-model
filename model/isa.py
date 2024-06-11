@@ -1,7 +1,7 @@
 from enum import Enum
 import json
 
-MEMORY_SIZE = 1024
+MEMORY_SIZE = 2048
 MAX_NUMBER = 1 << 31 - 1
 MIN_NUMBER = -(1 << 31)
 INPUT_PORT_ADDRESS = 1

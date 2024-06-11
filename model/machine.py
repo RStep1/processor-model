@@ -3,33 +3,25 @@ from isa import MEMORY_SIZE, Opcode, read_code, MAX_NUMBER, MIN_NUMBER
 import logging, sys
 
 REGISTER_AMOUNT = 8
-INSTRUCTION_LIMIT = 2000
-
-class Signal:
-    NEXT_IP = "next ip"
-    JMP_ARG = "jmp arg"
-    DATA_IP = "data ip"
+INSTRUCTION_LIMIT = 200
 
 class Register(Enum):
-    R0 = (0, "r0")
-    R1 = (0, "r1")
-    R2 = (0, "r2")
-    R3 = (0, "r3")
-    R4 = (0, "r4")
-    R5 = (0, "r5")
-    R6 = (0, "r6")
-    R7 = (0, "r7")
-    
-    IP = (0, "ip")
-    SP = (MEMORY_SIZE - 1, "sp")
-    AR = (0, "ar")
+    R0 = "r0"
+    R1 = "r1"
+    R2 = "r2"
+    R3 = "r3"
+    R4 = "r4"
+    R5 = "r5"
+    R6 = "r6"
+    R7 = "r7"
+    IP = "ip"
+    SP = "sp"
 
-    def __init__(self, reg_value: int, reg_name: str):
-        self.reg_value = reg_value
+    def __init__(self, reg_name: str):
         self.reg_name = reg_name
 
     def __str__(self):
-        return f"{self.reg_name}={self.reg_value}"
+        return f"{self.reg_name}"
 
 ALU_OPCODE_BINARY_HANDLERS = {
     Opcode.ADD: lambda left, right: int(left + right),
@@ -44,20 +36,9 @@ ALU_OPCODE_SINGLE_HANDLERS = {
     Opcode.INC: lambda left: left + 1,
     Opcode.DEC: lambda left: left - 1,
     Opcode.MOV: lambda left: left,
-    Opcode.ST: lambda left: left,   # поместить значение адреса на главную шину
-    Opcode.LD: lambda left: left    # поместить значение адреса на главную шину
+    Opcode.ST: lambda left: left,   # поместить значение адреса на главную шину, выставить флаги
+    Opcode.LD: lambda left: left    # поместить значение адреса на главную шину, выставить флаги
 }
-
-# class RegiterFile:
-#     def __init__(self):
-#         self.R0 = 0
-#         self.R1 = 0
-#         self.R2 = 0
-#         self.R3 = 0
-#         self.R4 = 0
-#         self.R5 = 0
-#         self.R6 = 0
-#         self.R7 = 0
 
 class ALU:
     z_flag = None
@@ -90,8 +71,8 @@ class ALU:
         return value
 
     def set_flags(self, value) -> None:
-        self.z_flag = (value == 0)
-        self.n_flag = (value < 0)
+        self.z_flag = value == 0
+        self.n_flag = value < 0
 
 class DataPath:
     input_buffer = None
@@ -100,10 +81,9 @@ class DataPath:
 
     def __init__(self, memory, input_buffer):
         self.memory = memory
-        self.memory_out = 0
 
         self.registers = [0] * REGISTER_AMOUNT
-        self.sp = 0
+        self.sp = MEMORY_SIZE - 1
         self.ar = 0
 
         self.alu = ALU()
@@ -128,11 +108,11 @@ class DataPath:
     def signal_latch_register(self, sel):
         pass
 
-    def signal_read(self, sel):
-        pass
+    def signal_read_memory(self):
+        return self.memory[self.ar]
 
-    def signal_write(self, sel):
-        pass
+    def signal_write_memory(self, value):
+        self.memory[self.ar] = value
 
 class ControlUnit:
     def __init__(self, memory, data_path):
@@ -140,6 +120,49 @@ class ControlUnit:
         self.memory = memory
         self.data_path = data_path
         self._tick = 0
+        self.instruction_executors = {
+            Opcode.INC: self.execute_unary_math_instruction,
+            Opcode.DEC: self.execute_unary_math_instruction,
+            Opcode.LD:  self.execute_load,
+            Opcode.LI:  self.execute_load_immediately,
+            Opcode.ST:  self.execute_store,
+            Opcode.IN:  self.execute_input,
+            Opcode.OUT: self.execute_output,
+            Opcode.ADD: self.execute_binary_math_instruction,
+            Opcode.SUB: self.execute_binary_math_instruction,
+            Opcode.MUL: self.execute_binary_math_instruction,
+            Opcode.DIV: self.execute_binary_math_instruction,
+            Opcode.MOD: self.execute_binary_math_instruction,
+            Opcode.CMP: self.execute_cmp,
+            Opcode.MOV: self.execute_mov,
+        }
+    
+    def execute_binary_math_instruction(self, opcode):
+        pass
+
+    def execute_unary_math_instruction(self, opcode):
+        pass
+
+    def execute_load(self):
+        pass
+
+    def execute_load_immediately(self):
+        pass
+
+    def execute_store(self):
+        pass
+
+    def execute_cmp(self):
+        pass
+
+    def execute_input(self):
+        pass
+
+    def execute_output(self):
+        pass
+
+    def execute_mov(self):
+        pass
     
     def tick(self):
         self._tick += 1
@@ -155,7 +178,7 @@ class ControlUnit:
             address = int(instr["args"][3])
             self.ip = address
 
-    def decode_and_execute_control_flow_instruction(self, instr, opcode):
+    def decode_and_execute_control_flow_instruction(self, opcode):
         if opcode is Opcode.HALT:
             raise StopIteration()
 
@@ -175,14 +198,15 @@ class ControlUnit:
         return False
 
     def decode_and_execute_instruction(self):
-        instr = self.memory[self.ip]
+        instr = self.data_path.signal_read_memory(self.ip)
+        self.tick()
         opcode = Opcode(instr["name"])
 
-        if self.decode_and_execute_control_flow_instruction(instr, opcode):
+        if self.decode_and_execute_control_flow_instruction(opcode):
             return
         
-        # decode other commmands
-
+        instruction_executor = self.instruction_executors[opcode]
+        instruction_executor(opcode)
 
     def __repr__(self):
         pass
@@ -210,6 +234,8 @@ def simulation(memory, input_tokens):
 
 def main(code_file, input_file):
     memory = read_code(code_file)
+    for index in range(len(memory), MEMORY_SIZE): # дополняем память пустыми ячейками до предела
+        memory.append({"index": index, "name": "", "args": []})
 
     with open(input_file, encoding="utf-8") as file:
         input_text = file.read()
@@ -217,7 +243,7 @@ def main(code_file, input_file):
         for char in input_text:
             input_token.append(char)
     
-    output, instr_counter, ticks = simulation(memory, input_tokens=input_token)
+    output, instr_counter, ticks = "", 0, 0 #simulation(memory, input_tokens=input_token)
 
     print("".join(output))
     print("instr_counter: ", instr_counter, "ticks: ", ticks)

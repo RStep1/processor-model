@@ -62,7 +62,7 @@ def build_json_instruction(address, command, command_args):
     return {"index": address, "name": command, "args": args}
 
 def translate_variables(variables, code):
-    for var_name, variable in variables.items():
+    for _, variable in variables.items():
         # if var_name in ["in", "out"]:
             # code.append(build_json_data(variable.address, var_name + "_port", variable.data))
         if len(variable.data) > 1: # это строка
@@ -103,29 +103,25 @@ def translate_section_text_stage_1(section_text, address, code):
         elif len(command_args) == 1: #jmp, jz, jnz, jn, jnn or op4
             opcode = Opcode(command)
             if opcode == Opcode.CALL:
-                code.append(build_json_instruction(address, Opcode.DEC.value, [Register.SP.reg_name]))
-                address+=1
-                code.append(build_json_instruction(address, Opcode.ST.value, [Register.IP.reg_name, Register.SP.reg_name]))
-                address+=1
-                code.append(build_json_instruction(address, Opcode.JMP.value, [command_args[0]]))
-                address+=1
+                code.extend([build_json_instruction(address, Opcode.DEC.value, [Register.SP.reg_name]),
+                             build_json_instruction(address + 1, Opcode.ST.value, [Register.IP.reg_name, Register.SP.reg_name]),
+                             build_json_instruction(address + 2, Opcode.JMP.value, [command_args[0]])])
+                address += 3
                 # dec sp
                 # st ip, sp 
-                # li ip, .loop
+                # jump .loop
             elif opcode == Opcode.PUSH:
                 # dec sp
                 # st reg, sp
-                code.append(build_json_instruction(address, Opcode.DEC.value, [Register.SP.reg_name]))
-                address+=1
-                code.append(build_json_instruction(address, Opcode.ST.value, [command_args[0], Register.SP.reg_name]))
-                address+=1
+                code.extend([build_json_instruction(address, Opcode.DEC.value, [Register.SP.reg_name]),
+                            build_json_instruction(address + 1, Opcode.ST.value, [command_args[0], Register.SP.reg_name])])
+                address += 2
             elif opcode == Opcode.POP:
                 # ld reg, sp
                 # inc sp
-                code.append(build_json_instruction(address, Opcode.LD.value, [command_args[0], Register.SP.reg_name]))
-                address+=1
-                code.append(build_json_instruction(address, Opcode.INC.value, [Register.SP.reg_name]))
-                address+=1
+                code.extend([build_json_instruction(address, Opcode.LD.value, [command_args[0], Register.SP.reg_name]),
+                             build_json_instruction(address + 1, Opcode.INC.value, [Register.SP.reg_name])])
+                address += 2
             else:
                 code.append(build_json_instruction(address, command, command_args))
                 address+=1
@@ -136,17 +132,19 @@ def translate_section_text_stage_1(section_text, address, code):
                 code.append(build_json_instruction(address, command, command_args))
                 address+=1
             else:
-                # ld ip, sp
+                # ld r, sp
                 # inc sp
-                code.append(build_json_instruction(address, Opcode.LD.value, [Register.IP.reg_name, Register.SP.reg_name]))
-                address+=1
-                code.append(build_json_instruction(address, Opcode.INC.value, [Register.SP.reg_name]))
-                address+=1
+                # jmp r
+                code.extend([build_json_instruction(address, Opcode.LD.value, [Register.RR.reg_name, Register.SP.reg_name]),
+                             build_json_instruction(address + 1, Opcode.INC.value, [Register.SP.reg_name]),
+                             build_json_instruction(address + 2, Opcode.JMP.value, [Register.RR.reg_name])])
+                address += 3
 
     return labels, code
 
 def translate_section_text_stage_2(labels, variables, code, section_text_address):
     # list(dict("index": integer, "name": Opcode, "args": list))
+
     for index, instruction in enumerate(code):
         if index > 0 and index < section_text_address: # пропускаем секцию .data
             continue

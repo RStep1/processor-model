@@ -1,6 +1,5 @@
 from enum import Enum
-from isa import MEMORY_SIZE, Opcode, Register, read_code, MAX_NUMBER, MIN_NUMBER
-from translator import is_jump_command
+from isa import MEMORY_SIZE, Opcode, Register, read_code, MAX_NUMBER, MIN_NUMBER, INPUT_PORT_ADDRESS, OUTPUT_PORT_ADDRESS
 import logging, sys
 
 REGISTER_AMOUNT = 8
@@ -8,6 +7,9 @@ INSTRUCTION_LIMIT = 200
 
 GENERAL_PURPOSE_REGISTERS = [Register.R0, Register.R1, Register.R2, Register.R3,
                              Register.R4, Register.R5, Register.R6, Register.R7]
+
+def is_jump_command(command):
+    return command in [Opcode.JMP, Opcode.JZ, Opcode.JNZ, Opcode.JN, Opcode.JNN]
 
 class SignalIP:
     NEXT_IP = "next_ip"
@@ -105,17 +107,20 @@ class DataPath:
     def signal_write_memory(self, value):
         self.memory[self.ar] = value
 
-    def signal_latch_register(self, register, value):
+    def signal_latch_register(self, register):
         match register:
             case Register.SP:
-                self.sp = value
+                self.sp = self.main_bus
             case Register.RR:
-                self.rr = value
+                self.rr = self.main_bus
             case _ if register in GENERAL_PURPOSE_REGISTERS:
                 index = GENERAL_PURPOSE_REGISTERS.index(register)
-                self.registers[index] = value
+                self.registers[index] = self.main_bus
             case _:
                 raise ValueError(f"Inaccessible or non-existent register {register}")
+    
+    def signal_latch_ar(self):
+        self.ar = self.main_bus
 
     def sel_register(self, register):
         match register:
@@ -164,40 +169,104 @@ class ControlUnit:
         self.tick()
 
         res_reg = args[0]
-        self.data_path.signal_latch_register(res_reg, self.data_path.main_bus)
+        self.data_path.signal_latch_register(res_reg)
         self.tick()
 
     def execute_unary_math_instruction(self, opcode, args):
         left_reg = args[0]
-        self.data_path.alu.sel_reg_left_alu = left_reg
         left = self.data_path.sel_register(left_reg)
         alu_out = self.data_path.alu.process(left, Register.R0, opcode)
         self.data_path.main_bus = alu_out
         self.tick()
 
-        self.data_path.signal_latch_register(left_reg, self.data_path.main_bus)
+        self.data_path.signal_latch_register(left_reg)
+        self.tick()
+
+    def execute_store(self, opcode, args):
+        if args[3] in Register:
+            left = self.data_path.sel_register(args[3])
+            self.data_path.main_bus = self.data_path.alu.process(left, Register.R0, opcode)
+        else:
+            self.data_path.main_bus = int(args[3])
+
+        self.data_path.signal_latch_ar()
+        self.tick()
+
+        reg_to_store = args[0]
+        value = self.data_path.sel_register(reg_to_store)
+        self.data_path.signal_write_memory(value)
         self.tick()
 
     def execute_load(self, opcode, args):
-        pass
+        if args[3] in Register:
+            left = self.data_path.sel_register(args[3])
+            self.data_path.main_bus = self.data_path.alu.process(left, Register.R0, opcode)
+        else:
+            self.data_path.main_bus = int(args[3])
+
+        self.data_path.signal_latch_ar()
+        self.tick()
+
+        self.data_path.main_bus = self.data_path.signal_read_memory(self.data_path.ar)
+        reg_to_load = args[0]
+        self.data_path.signal_latch_register(reg_to_load)
+        self.tick()
 
     def execute_load_immediately(self, opcode, args):
-        pass
-
-    def execute_store(self, opcode, args):
-        pass
+        register = args[0]
+        value = int(args[3])
+        self.data_path.main_bus = value
+        self.data_path.signal_latch_register(register)
+        self.tick()
 
     def execute_cmp(self, opcode, args):
-        pass
-
-    def execute_input(self, opcode, args):
-        pass
-
-    def execute_output(self, opcode, args):
-        pass
+        left_reg = args[1]
+        right_reg = args[2]
+        left = self.data_path.sel_register(left_reg)
+        right = self.data_path.sel_register(right_reg)
+        alu_out = self.data_path.alu.process(left, right, opcode)
+        self.data_path.main_bus = alu_out
+        self.tick()
 
     def execute_mov(self, opcode, args):
-        pass
+        reg_to_load = args[0]
+        reg_to_copy = args[1]
+        left = self.data_path.sel_register(reg_to_copy)
+        alu_out = self.data_path.alu.process(left, Register.R0, opcode)
+        self.data_path.main_bus = alu_out
+        self.tick()
+
+        self.data_path.signal_latch_register(reg_to_load)
+        self.tick()
+
+    def execute_input(self, opcode, args):
+        if len(self.data_path.input_buffer) == 0:
+            raise EOFError()
+        symbol = self.data_path.input_buffer.pop(0)
+        symbol_code = ord(symbol)
+        self.memory[INPUT_PORT_ADDRESS]["args"][0] = symbol_code
+
+        self.data_path.main_bus = INPUT_PORT_ADDRESS
+        self.data_path.signal_latch_ar()
+        self.tick()
+
+        register = args[0]
+        self.data_path.main_bus = self.data_path.signal_read_memory(self.data_path.ar)
+        self.data_path.signal_latch_register(register)
+        self.tick()
+
+    def execute_output(self, opcode, args):
+        self.data_path.main_bus = OUTPUT_PORT_ADDRESS
+        self.data_path.signal_latch_ar()
+        self.tick()
+
+        register = args[0]
+        value = self.data_path.sel_register(register)
+        self.data_path.signal_write_memory(value)
+        self.tick()
+
+        symbol = chr(self.memory[OUTPUT_PORT_ADDRESS]["args"][0])
+        self.data_path.output_buffer.append(symbol)
 
     def tick(self):
         self._tick += 1
@@ -261,6 +330,7 @@ class ControlUnit:
 
         instruction_executor = self.instruction_executors[opcode]
         instruction_executor(opcode, args)
+        self.signal_latch_ip(sel_next=SignalIP.NEXT_IP)
 
     def __repr__(self):
         pass

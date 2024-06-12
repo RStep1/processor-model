@@ -1,44 +1,12 @@
 from enum import Enum
-from isa import MEMORY_SIZE, Opcode, read_code, MAX_NUMBER, MIN_NUMBER
+from isa import MEMORY_SIZE, Opcode, Register, read_code, MAX_NUMBER, MIN_NUMBER
 import logging, sys
 
 REGISTER_AMOUNT = 8
 INSTRUCTION_LIMIT = 200
-
-class Register(Enum):
-    R0 = "r0"
-    R1 = "r1"
-    R2 = "r2"
-    R3 = "r3"
-    R4 = "r4"
-    R5 = "r5"
-    R6 = "r6"
-    R7 = "r7"
-    IP = "ip"
-    SP = "sp"
-
-    def __init__(self, reg_name: str):
-        self.reg_name = reg_name
-
-    def __str__(self):
-        return f"{self.reg_name}"
-
-ALU_OPCODE_BINARY_HANDLERS = {
-    Opcode.ADD: lambda left, right: int(left + right),
-    Opcode.SUB: lambda left, right: int(left - right),
-    Opcode.MUL: lambda left, right: int(left * right),
-    Opcode.DIV: lambda left, right: int(left / right),
-    Opcode.MOD: lambda left, right: int(left % right),
-    Opcode.CMP: lambda left, right: int(left - right),
-}
-
-ALU_OPCODE_SINGLE_HANDLERS = {
-    Opcode.INC: lambda left: left + 1,
-    Opcode.DEC: lambda left: left - 1,
-    Opcode.MOV: lambda left: left,
-    Opcode.ST: lambda left: left,   # поместить значение адреса на главную шину, выставить флаги
-    Opcode.LD: lambda left: left    # поместить значение адреса на главную шину, выставить флаги
-}
+    
+GENERAL_PURPOSE_REGISTERS = [Register.R0, Register.R1, Register.R2, Register.R3,
+                             Register.R4, Register.R5, Register.R6, Register.R7]
 
 class ALU:
     z_flag = None
@@ -47,17 +15,33 @@ class ALU:
     def __init__(self):
         self.z_flag = 0
         self.n_flag = 0
+
+    alu_opcode_binary_handlers = {
+    Opcode.ADD: lambda left, right: int(left + right),
+    Opcode.SUB: lambda left, right: int(left - right),
+    Opcode.MUL: lambda left, right: int(left * right),
+    Opcode.DIV: lambda left, right: int(left / right),
+    Opcode.MOD: lambda left, right: int(left % right),
+    Opcode.CMP: lambda left, right: int(left - right),
+    }
+
+    alu_opcode_unary_handlers = {
+        Opcode.INC: lambda left: left + 1,
+        Opcode.DEC: lambda left: left - 1,
+        Opcode.MOV: lambda left: left,
+        Opcode.LD: lambda left: left,    # поместить значение адреса на главную шину, выставить флаги
+    }
     
     def process(self, left: int, right: int, opcode: Opcode) -> int:
         assert (
-            opcode in ALU_OPCODE_BINARY_HANDLERS or opcode in ALU_OPCODE_SINGLE_HANDLERS
+            opcode in self.alu_opcode_binary_handlers or opcode in self.alu_opcode_unary_handlers
         ), f"Unknown ALU command {opcode.value}"
         
-        if opcode in ALU_OPCODE_BINARY_HANDLERS:
-            handler = ALU_OPCODE_BINARY_HANDLERS[opcode]
+        if opcode in self.alu_opcode_binary_handlers:
+            handler = self.alu_opcode_binary_handlers[opcode]
             value = handler(left, right)
         else:
-            handler = ALU_OPCODE_SINGLE_HANDLERS[opcode]
+            handler = self.alu_opcode_unary_handlers[opcode]
             value = handler(left)
         value = self.handle_overflow(value)
         self.set_flags(value)
@@ -85,6 +69,7 @@ class DataPath:
         self.registers = [0] * REGISTER_AMOUNT
         self.sp = MEMORY_SIZE - 1
         self.ar = 0
+        self.ip = 0
 
         self.alu = ALU()
 
@@ -95,7 +80,7 @@ class DataPath:
         main_bus обновляется значениями:
             1) Из выхода АЛУ
             2) При чтении данных из памяти
-            3) При прямой загрузке данных
+            3) При прямой прямой загрузке данных
         """
         self.main_bus = 0
 
@@ -105,18 +90,33 @@ class DataPath:
     def is_negative(self):
         return self.alu.n_flag
 
-    def signal_latch_register(self, sel):
-        pass
-
-    def signal_read_memory(self):
-        return self.memory[self.ar]
+    def signal_read_memory(self, address):
+        return self.memory[address]
 
     def signal_write_memory(self, value):
         self.memory[self.ar] = value
 
+    def signal_latch_register(self, register, value):
+        if register is Register.SP:
+            self.sp = value
+        elif register is Register.IP:
+            self.ip = value
+        elif register in GENERAL_PURPOSE_REGISTERS:
+            index = GENERAL_PURPOSE_REGISTERS.index(register)
+            self.registers[index] = value
+
+    def sel_register(self, register):
+        if register is Register.SP:
+            return self.sp
+        elif register is Register.IP:
+            return self.ip
+        elif register in GENERAL_PURPOSE_REGISTERS:
+            index = GENERAL_PURPOSE_REGISTERS.index(register)
+            return self.registers[index]
+
 class ControlUnit:
     def __init__(self, memory, data_path):
-        self.ip = 0
+        # self.ip = 0
         self.memory = memory
         self.data_path = data_path
         self._tick = 0
@@ -137,28 +137,38 @@ class ControlUnit:
             Opcode.MOV: self.execute_mov,
         }
     
-    def execute_binary_math_instruction(self, opcode):
-        pass
+    def execute_binary_math_instruction(self, opcode, args):
+        left_reg = args[1]
+        right_reg = args[2]
+        left = self.data_path.sel_register(left_reg)
+        right = self.data_path.sel_register(right_reg)
+        alu_out = self.data_path.alu.process(left, right, opcode)
+        self.data_path.main_bus = alu_out
+        self.tick()
+
+        res_reg = args[0]
+        self.data_path.signal_latch_register(res_reg, self.data_path.main_bus)
+        self.tick()
 
     def execute_unary_math_instruction(self, opcode):
         pass
 
-    def execute_load(self):
+    def execute_load(self, opcode):
         pass
 
-    def execute_load_immediately(self):
+    def execute_load_immediately(self, opcode):
         pass
 
-    def execute_store(self):
+    def execute_store(self, opcode):
         pass
 
-    def execute_cmp(self):
+    def execute_cmp(self, opcode):
         pass
 
-    def execute_input(self):
+    def execute_input(self, opcode):
         pass
 
-    def execute_output(self):
+    def execute_output(self, opcode):
         pass
 
     def execute_mov(self):
@@ -172,11 +182,11 @@ class ControlUnit:
     
     def signal_latch_ip(self, sel_next):
         if sel_next:
-            self.ip += 1
+            self.data_path.ip += 1
         else:
-            instr = self.memory[self.ip]
+            instr = self.memory[self.data_path.ip]
             address = int(instr["args"][3])
-            self.ip = address
+            self.data_path.ip = address
 
     def decode_and_execute_control_flow_instruction(self, opcode):
         if opcode is Opcode.HALT:
@@ -198,15 +208,16 @@ class ControlUnit:
         return False
 
     def decode_and_execute_instruction(self):
-        instr = self.data_path.signal_read_memory(self.ip)
+        instr = self.data_path.signal_read_memory(self.data_path.ip)
         self.tick()
         opcode = Opcode(instr["name"])
+        args = instr["args"]
 
         if self.decode_and_execute_control_flow_instruction(opcode):
             return
-        
+                    
         instruction_executor = self.instruction_executors[opcode]
-        instruction_executor(opcode)
+        instruction_executor(opcode, args)
 
     def __repr__(self):
         pass
@@ -234,6 +245,8 @@ def simulation(memory, input_tokens):
 
 def main(code_file, input_file):
     memory = read_code(code_file)
+    # for cell in memory:
+    #     print(cell)
     for index in range(len(memory), MEMORY_SIZE): # дополняем память пустыми ячейками до предела
         memory.append({"index": index, "name": "", "args": []})
 

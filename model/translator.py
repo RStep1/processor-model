@@ -1,6 +1,6 @@
 import sys, json, re
 
-from isa import Opcode, Variable, write_code, INPUT_PORT_ADDRESS, OUTPUT_PORT_ADDRESS, MIN_NUMBER, MAX_NUMBER, MEMORY_SIZE
+from isa import Opcode, Variable, write_code, is_register, INPUT_PORT_ADDRESS, OUTPUT_PORT_ADDRESS, MIN_NUMBER, MAX_NUMBER, MEMORY_SIZE
 from machine import Register
 
 SECTION_DATA = "section .data:"
@@ -9,9 +9,6 @@ START_LABEL = ".start"
 
 def get_meaningful_token(line):
     return line.split(";", 1)[0].strip()
-
-def is_register(arg):
-    return arg.startswith("r")
 
 def remove_comment(line: str) -> str:
     return re.sub(r";.*", "", line)

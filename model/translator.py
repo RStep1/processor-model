@@ -10,23 +10,12 @@ START_LABEL = ".start"
 def get_meaningful_token(line):
     return line.split(";", 1)[0].strip()
 
-def remove_comment(line: str) -> str:
-    return re.sub(r";.*", "", line)
-
-# Удаление лишних пробелов между словами и пробелов по концам строки
-def remove_extra_spaces(line: str) -> str:
-    line = line.strip()
-    return re.sub(r"\s+", " ", line)
-
-# Очистка исходного текста от комментариев, лишних пробелов и пустых строк
-def clean_source(source: str) -> str:
-    lines = source.splitlines()
-
-    lines = map(remove_comment, lines)
-    lines = map(remove_extra_spaces, lines)
-    lines = filter(bool, lines)  # для удаления пустых строк
-
-    return "\n".join(lines)
+def clean_assembly_code(assembly_code):
+    # удаление комментариев
+    code_no_comments = re.sub(r';.*', '', assembly_code)
+    # удаление пустых строк и лишних пробелов
+    cleaned_code = '\n'.join(line.strip() for line in code_no_comments.split('\n') if line.strip())
+    return cleaned_code
 
 def is_jump_command(command):
     return command in [Opcode.JMP, Opcode.JZ, Opcode.JNZ, Opcode.JN, Opcode.JNN]
@@ -257,7 +246,7 @@ def main(source, target):
     with open(source, encoding="utf-8") as f:
         source = f.read()
 
-    source = clean_source(source)
+    source = clean_assembly_code(source)
     code, section_text_address = translate(source)
 
     write_code(target, code)

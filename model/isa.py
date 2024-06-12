@@ -18,6 +18,7 @@ class Register(Enum):
     R7 = "r7"
     IP = "ip"
     SP = "sp"
+    RR = "rr" # return register
 
     def __init__(self, reg_name: str):
         self.reg_name = reg_name

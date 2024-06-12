@@ -1,12 +1,18 @@
 from enum import Enum
 from isa import MEMORY_SIZE, Opcode, Register, read_code, MAX_NUMBER, MIN_NUMBER
+from translator import is_jump_command
 import logging, sys
 
 REGISTER_AMOUNT = 8
 INSTRUCTION_LIMIT = 200
-    
+
 GENERAL_PURPOSE_REGISTERS = [Register.R0, Register.R1, Register.R2, Register.R3,
                              Register.R4, Register.R5, Register.R6, Register.R7]
+
+class SignalIP:
+    NEXT_IP = "next_ip"
+    JMP_LABEL = "jmp_label"
+    JMP_REG = "jmp_reg"
 
 class ALU:
     z_flag = None
@@ -28,15 +34,16 @@ class ALU:
     alu_opcode_unary_handlers = {
         Opcode.INC: lambda left: left + 1,
         Opcode.DEC: lambda left: left - 1,
-        Opcode.MOV: lambda left: left,
-        Opcode.LD: lambda left: left,    # поместить значение адреса на главную шину, выставить флаги
+        Opcode.MOV: lambda left: left,   # -|
+        Opcode.LD: lambda left: left,    #  | поместить значение регистра на главную шину, выставить флаги
+        Opcode.JMP: lambda left: left,   # -|
     }
-    
+
     def process(self, left: int, right: int, opcode: Opcode) -> int:
         assert (
             opcode in self.alu_opcode_binary_handlers or opcode in self.alu_opcode_unary_handlers
         ), f"Unknown ALU command {opcode.value}"
-        
+
         if opcode in self.alu_opcode_binary_handlers:
             handler = self.alu_opcode_binary_handlers[opcode]
             value = handler(left, right)
@@ -46,7 +53,7 @@ class ALU:
         value = self.handle_overflow(value)
         self.set_flags(value)
         return value
-    
+
     def handle_overflow(self, value: int) -> int:
         if value > MAX_NUMBER:
             value %= MAX_NUMBER
@@ -68,6 +75,8 @@ class DataPath:
 
         self.registers = [0] * REGISTER_AMOUNT
         self.sp = MEMORY_SIZE - 1
+        self.rr = 0
+
         self.ar = 0
         self.ip = 0
 
@@ -86,7 +95,7 @@ class DataPath:
 
     def is_zero(self):
         return self.alu.z_flag
-    
+
     def is_negative(self):
         return self.alu.n_flag
 
@@ -97,26 +106,34 @@ class DataPath:
         self.memory[self.ar] = value
 
     def signal_latch_register(self, register, value):
-        if register is Register.SP:
-            self.sp = value
-        elif register is Register.IP:
-            self.ip = value
-        elif register in GENERAL_PURPOSE_REGISTERS:
-            index = GENERAL_PURPOSE_REGISTERS.index(register)
-            self.registers[index] = value
+        match register:
+            case Register.SP:
+                self.sp = value
+            case Register.RR:
+                self.rr = value
+            case _ if register in GENERAL_PURPOSE_REGISTERS:
+                index = GENERAL_PURPOSE_REGISTERS.index(register)
+                self.registers[index] = value
+            case _:
+                raise ValueError(f"Inaccessible or non-existent register {register}")
 
     def sel_register(self, register):
-        if register is Register.SP:
-            return self.sp
-        elif register is Register.IP:
-            return self.ip
-        elif register in GENERAL_PURPOSE_REGISTERS:
-            index = GENERAL_PURPOSE_REGISTERS.index(register)
-            return self.registers[index]
+        match register:
+            case Register.SP:
+                return self.sp
+            case Register.RR:
+                return self.rr
+            case Register.IP:
+                return self.ip
+            case _ if register in GENERAL_PURPOSE_REGISTERS:
+                index = GENERAL_PURPOSE_REGISTERS.index(register)
+                return self.registers[index]
+            case _:
+                raise ValueError(f"Inaccessible or non-existent register {register}")
+
 
 class ControlUnit:
     def __init__(self, memory, data_path):
-        # self.ip = 0
         self.memory = memory
         self.data_path = data_path
         self._tick = 0
@@ -136,7 +153,7 @@ class ControlUnit:
             Opcode.CMP: self.execute_cmp,
             Opcode.MOV: self.execute_mov,
         }
-    
+
     def execute_binary_math_instruction(self, opcode, args):
         left_reg = args[1]
         right_reg = args[2]
@@ -150,62 +167,88 @@ class ControlUnit:
         self.data_path.signal_latch_register(res_reg, self.data_path.main_bus)
         self.tick()
 
-    def execute_unary_math_instruction(self, opcode):
+    def execute_unary_math_instruction(self, opcode, args):
+        left_reg = args[0]
+        self.data_path.alu.sel_reg_left_alu = left_reg
+        left = self.data_path.sel_register(left_reg)
+        alu_out = self.data_path.alu.process(left, Register.R0, opcode)
+        self.data_path.main_bus = alu_out
+        self.tick()
+
+        self.data_path.signal_latch_register(left_reg, self.data_path.main_bus)
+        self.tick()
+
+    def execute_load(self, opcode, args):
         pass
 
-    def execute_load(self, opcode):
+    def execute_load_immediately(self, opcode, args):
         pass
 
-    def execute_load_immediately(self, opcode):
+    def execute_store(self, opcode, args):
         pass
 
-    def execute_store(self, opcode):
+    def execute_cmp(self, opcode, args):
         pass
 
-    def execute_cmp(self, opcode):
+    def execute_input(self, opcode, args):
         pass
 
-    def execute_input(self, opcode):
+    def execute_output(self, opcode, args):
         pass
 
-    def execute_output(self, opcode):
+    def execute_mov(self, opcode, args):
         pass
 
-    def execute_mov(self):
-        pass
-    
     def tick(self):
         self._tick += 1
 
     def current_tick(self):
         return self._tick
-    
-    def signal_latch_ip(self, sel_next):
-        if sel_next:
-            self.data_path.ip += 1
-        else:
-            instr = self.memory[self.data_path.ip]
-            address = int(instr["args"][3])
-            self.data_path.ip = address
 
-    def decode_and_execute_control_flow_instruction(self, opcode):
+    def signal_latch_ip(self, sel_next):
+        match sel_next:
+            case SignalIP.NEXT_IP:
+                self.data_path.ip += 1
+            case SignalIP.JMP_LABEL:
+                instr = self.memory[self.data_path.ip]
+                address = int(instr["args"][3])
+                self.data_path.ip = address
+            case SignalIP.JMP_REG:
+                address = self.data_path.main_bus
+                self.data_path.ip = address
+
+    def decode_and_execute_control_flow_instruction(self, opcode, args):
         if opcode is Opcode.HALT:
             raise StopIteration()
 
-        flow_instructions = {
-            Opcode.JMP: lambda: (self.signal_latch_ip(sel_next=False)),
-            Opcode.JZ: lambda: (self.signal_latch_ip(sel_next=not self.data_path.is_zero())),
-            Opcode.JNZ: lambda: (self.signal_latch_ip(sel_next=self.data_path.is_zero())),
-            Opcode.JN: lambda: (self.signal_latch_ip(sel_next=not self.data_path.is_negative())),
-            Opcode.JNN: lambda: (self.signal_latch_ip(sel_next=self.data_path.is_negative())),
-        }
+        if is_jump_command(opcode):
+            sel_next = SignalIP.NEXT_IP
+            match opcode:
+                case Opcode.JMP:
+                    if args[3] in Register:
+                        reg = args[3]
+                        self.data_path.main_bus = self.data_path.alu.process(reg, Register.R0, Opcode.JMP)
+                        self.tick()
 
-        if opcode in flow_instructions:
-            flow_instructions[opcode]()
+                    sel_next = SignalIP.JMP_REG if args[3] == Register.RR.reg_name else SignalIP.NEXT_IP
+                case Opcode.JZ:
+                    sel_next = SignalIP.JMP_LABEL if not self.data_path.is_zero() else SignalIP.NEXT_IP
+                case Opcode.JNZ:
+                    sel_next = SignalIP.JMP_LABEL if self.data_path.is_zero() else SignalIP.NEXT_IP
+                case Opcode.JN:
+                    sel_next = SignalIP.JMP_LABEL if not self.data_path.is_negative() else SignalIP.NEXT_IP
+                case Opcode.JNN:
+                    sel_next = SignalIP.JMP_LABEL if self.data_path.is_negative() else SignalIP.NEXT_IP
+                case _:
+                    logging.warning("Unknown jump opcode %s", opcode)
+
+            self.signal_latch_ip(sel_next=sel_next)
             self.tick()
+
             return True
-        
+
         return False
+
 
     def decode_and_execute_instruction(self):
         instr = self.data_path.signal_read_memory(self.data_path.ip)
@@ -213,9 +256,9 @@ class ControlUnit:
         opcode = Opcode(instr["name"])
         args = instr["args"]
 
-        if self.decode_and_execute_control_flow_instruction(opcode):
+        if self.decode_and_execute_control_flow_instruction(opcode, args):
             return
-                    
+
         instruction_executor = self.instruction_executors[opcode]
         instruction_executor(opcode, args)
 
@@ -255,8 +298,10 @@ def main(code_file, input_file):
         input_token = []
         for char in input_text:
             input_token.append(char)
-    
-    output, instr_counter, ticks = "", 0, 0 #simulation(memory, input_tokens=input_token)
+
+    # output, instr_counter, ticks = "", 0, 0 #simulation(memory, input_tokens=input_token)
+    output, instr_counter, ticks = simulation(memory, input_tokens=input_token)
+
 
     print("".join(output))
     print("instr_counter: ", instr_counter, "ticks: ", ticks)

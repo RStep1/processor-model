@@ -39,8 +39,11 @@ def build_json_instruction(address, command, command_args):
             args[0] = command_args[0]
     elif len(command_args) == 2:
         args[0] = command_args[0]
-        if is_register(command_args[1]): #is 2nd arg is register
-            args[1] = command_args[1]
+        if is_register(command_args[1]): #is 2nd arg register
+            if command in [Opcode.ST.value, Opcode.LD.value]:
+                args[3] = command_args[1]
+            else:
+                args[1] = command_args[1]
         else:
             args[3] = command_args[1]
     elif len(command_args) == 3:

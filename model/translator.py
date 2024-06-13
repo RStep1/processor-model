@@ -1,7 +1,7 @@
 import sys, json, re
 
 from isa import Opcode, Variable, write_code, is_register, INPUT_PORT_ADDRESS, OUTPUT_PORT_ADDRESS, MIN_NUMBER, MAX_NUMBER, MEMORY_SIZE
-from machine import Register
+from machine import Register, is_jump_command
 
 SECTION_DATA = "section .data:"
 SECTION_TEXT = "section .text:"
@@ -16,9 +16,6 @@ def clean_assembly_code(assembly_code):
     # удаление пустых строк и лишних пробелов
     cleaned_code = '\n'.join(line.strip() for line in code_no_comments.split('\n') if line.strip())
     return cleaned_code
-
-def is_jump_command(command):
-    return command in [Opcode.JMP, Opcode.JZ, Opcode.JNZ, Opcode.JN, Opcode.JNN]
 
 def remove_commas(args):
     new_args = []
@@ -50,14 +47,11 @@ def build_json_instruction(address, command, command_args):
         for i in range(3):
             args[i] = command_args[i]
 
-    #return f'{{"index": {address}, "name": "{command}", "args": {args}}}'
     return {"index": address, "name": command, "args": args}
 
 def translate_variables(variables, code):
     for _, variable in variables.items():
-        # if var_name in ["in", "out"]:
-            # code.append(build_json_data(variable.address, var_name + "_port", variable.data))
-        if len(variable.data) > 1: # это строка
+        if len(variable.data) > 1: # это строка или буфер
             address = variable.address
             for cell in variable.data:
                 code.append(build_json_data(address, variable.name, [cell]))
@@ -84,7 +78,7 @@ def translate_section_text_stage_1(section_text, address, code):
             for arg in command_args:
                 if not is_register(arg):
                     is_all_regs = False
-            assert is_all_regs == True, "Arithmetic commands only can take registers as arguments"
+            assert is_all_regs is True, "Arithmetic commands only can take registers as arguments"
             code.append(build_json_instruction(address, command, command_args))
             address+=1
         elif len(command_args) == 2: #store, load or cmp, move
@@ -100,7 +94,7 @@ def translate_section_text_stage_1(section_text, address, code):
                              build_json_instruction(address + 2, Opcode.JMP.value, [command_args[0]])])
                 address += 3
                 # dec sp
-                # st ip, sp 
+                # st ip, sp
                 # jump .loop
             elif opcode == Opcode.PUSH:
                 # dec sp
@@ -124,23 +118,24 @@ def translate_section_text_stage_1(section_text, address, code):
                 code.append(build_json_instruction(address, command, command_args))
                 address+=1
             else:
-                # ld r, sp
+                # ld rr, sp
                 # inc sp
-                # jmp r
+                # inc rr
+                # inc rr
+                # jmp rr
                 code.extend([build_json_instruction(address, Opcode.LD.value, [Register.RR.reg_name, Register.SP.reg_name]),
                              build_json_instruction(address + 1, Opcode.INC.value, [Register.SP.reg_name]),
-                             build_json_instruction(address + 2, Opcode.JMP.value, [Register.RR.reg_name])])
-                address += 3
+                             build_json_instruction(address + 2, Opcode.INC.value, [Register.RR.reg_name]),
+                             build_json_instruction(address + 3, Opcode.INC.value, [Register.RR.reg_name]),
+                             build_json_instruction(address + 4, Opcode.JMP.value, [Register.RR.reg_name])])
+                address += 5
 
     return labels, code
 
 def translate_section_text_stage_2(labels, variables, code, section_text_address):
-    # list(dict("index": integer, "name": Opcode, "args": list))
-
     for index, instruction in enumerate(code):
-        if index > 0 and index < section_text_address: # пропускаем секцию .data
+        if index > 0 and index < section_text_address: # пропускаем секцию .data и первую инструкцию
             continue
-        # print(f"{instruction["index"], instruction["name"], instruction["args"]}")
         fourth_arg = instruction["args"][3]
         if fourth_arg is None:
             continue
@@ -227,18 +222,12 @@ def translate(source):
 
     variables, section_text_address = translate_section_data(section_data)
 
-    # for name, value in variables.items():
-    #     print(f"{name}={value.data}")
-
     code = []
     code.append(build_json_instruction(0, Opcode.JMP.value, [START_LABEL])) #add jmp instruction on program beginning
 
     code = translate_variables(variables, code)
     labels, code = translate_section_text_stage_1(section_text, section_text_address, code)
     code = translate_section_text_stage_2(labels, variables, code, section_text_address)
-    
-    for line in code:
-        print(line)
 
     json_code = json.dumps(code, indent=4)
 

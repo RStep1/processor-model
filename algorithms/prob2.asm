@@ -18,8 +18,8 @@ section .text:
         mov r1, r2
         
         li r5, LIMIT_VALUE
-        cmp r1, r5
-        jz .end             ; if term > 4000000 go to halt
+        cmp r5, r1
+        jn .end             ; if term > 4000000 go to halt
         call .sum_if_even
         jmp .loop
     

@@ -3,13 +3,16 @@ from isa import MEMORY_SIZE, Opcode, Register, read_code, MAX_NUMBER, MIN_NUMBER
 import logging, sys
 
 REGISTER_AMOUNT = 8
-INSTRUCTION_LIMIT = 200
+INSTRUCTION_LIMIT = 2000
 
 GENERAL_PURPOSE_REGISTERS = [Register.R0, Register.R1, Register.R2, Register.R3,
                              Register.R4, Register.R5, Register.R6, Register.R7]
 
 def is_jump_command(command):
     return command in [Opcode.JMP, Opcode.JZ, Opcode.JNZ, Opcode.JN, Opcode.JNN]
+
+def get_cell_value(cell):
+    return cell["args"][0]
 
 class SignalIP:
     NEXT_IP = "next_ip"
@@ -25,12 +28,12 @@ class ALU:
         self.n_flag = 0
 
     alu_opcode_binary_handlers = {
-    Opcode.ADD: lambda left, right: int(left + right),
-    Opcode.SUB: lambda left, right: int(left - right),
-    Opcode.MUL: lambda left, right: int(left * right),
-    Opcode.DIV: lambda left, right: int(left / right),
-    Opcode.MOD: lambda left, right: int(left % right),
-    Opcode.CMP: lambda left, right: int(left - right),
+        Opcode.ADD: lambda left, right: int(left + right),
+        Opcode.SUB: lambda left, right: int(left - right),
+        Opcode.MUL: lambda left, right: int(left * right),
+        Opcode.DIV: lambda left, right: int(left / right),
+        Opcode.MOD: lambda left, right: int(left % right),
+        Opcode.CMP: lambda left, right: int(left - right),
     }
 
     alu_opcode_unary_handlers = {
@@ -38,6 +41,7 @@ class ALU:
         Opcode.DEC: lambda left: left - 1,
         Opcode.MOV: lambda left: left,   # -|
         Opcode.LD: lambda left: left,    #  | поместить значение регистра на главную шину, выставить флаги
+        Opcode.ST: lambda left: left,    #  |
         Opcode.JMP: lambda left: left,   # -|
     }
 
@@ -105,7 +109,7 @@ class DataPath:
         return self.memory[address]
 
     def signal_write_memory(self, value):
-        self.memory[self.ar] = value
+        self.memory[self.ar]["args"] = [value]
 
     def signal_latch_register(self, register):
         match register:
@@ -175,7 +179,7 @@ class ControlUnit:
     def execute_unary_math_instruction(self, opcode, args):
         left_reg = args[0]
         left = self.data_path.sel_register(left_reg)
-        alu_out = self.data_path.alu.process(left, Register.R0, opcode)
+        alu_out = self.data_path.alu.process(left, self.data_path.registers[0], opcode)
         self.data_path.main_bus = alu_out
         self.tick()
 
@@ -185,7 +189,7 @@ class ControlUnit:
     def execute_store(self, opcode, args):
         if args[3] in Register:
             left = self.data_path.sel_register(args[3])
-            self.data_path.main_bus = self.data_path.alu.process(left, Register.R0, opcode)
+            self.data_path.main_bus = self.data_path.alu.process(left, self.data_path.registers[0], opcode)
         else:
             self.data_path.main_bus = int(args[3])
 
@@ -200,19 +204,19 @@ class ControlUnit:
     def execute_load(self, opcode, args):
         if args[3] in Register:
             left = self.data_path.sel_register(args[3])
-            self.data_path.main_bus = self.data_path.alu.process(left, Register.R0, opcode)
+            self.data_path.main_bus = self.data_path.alu.process(left, self.data_path.registers[0], opcode)
         else:
             self.data_path.main_bus = int(args[3])
 
         self.data_path.signal_latch_ar()
         self.tick()
 
-        self.data_path.main_bus = self.data_path.signal_read_memory(self.data_path.ar)
+        self.data_path.main_bus = get_cell_value(self.data_path.signal_read_memory(self.data_path.ar))
         reg_to_load = args[0]
         self.data_path.signal_latch_register(reg_to_load)
         self.tick()
 
-    def execute_load_immediately(self, opcode, args):
+    def execute_load_immediately(self, _, args):
         register = args[0]
         value = int(args[3])
         self.data_path.main_bus = value
@@ -220,8 +224,8 @@ class ControlUnit:
         self.tick()
 
     def execute_cmp(self, opcode, args):
-        left_reg = args[1]
-        right_reg = args[2]
+        left_reg = args[0]
+        right_reg = args[1]
         left = self.data_path.sel_register(left_reg)
         right = self.data_path.sel_register(right_reg)
         alu_out = self.data_path.alu.process(left, right, opcode)
@@ -232,14 +236,14 @@ class ControlUnit:
         reg_to_load = args[0]
         reg_to_copy = args[1]
         left = self.data_path.sel_register(reg_to_copy)
-        alu_out = self.data_path.alu.process(left, Register.R0, opcode)
+        alu_out = self.data_path.alu.process(left, self.data_path.registers[0], opcode)
         self.data_path.main_bus = alu_out
         self.tick()
 
         self.data_path.signal_latch_register(reg_to_load)
         self.tick()
 
-    def execute_input(self, opcode, args):
+    def execute_input(self, _, args):
         if len(self.data_path.input_buffer) == 0:
             raise EOFError()
         symbol = self.data_path.input_buffer.pop(0)
@@ -251,11 +255,11 @@ class ControlUnit:
         self.tick()
 
         register = args[0]
-        self.data_path.main_bus = self.data_path.signal_read_memory(self.data_path.ar)
+        self.data_path.main_bus = get_cell_value(self.data_path.signal_read_memory(self.data_path.ar))
         self.data_path.signal_latch_register(register)
         self.tick()
 
-    def execute_output(self, opcode, args):
+    def execute_output(self, _, args):
         self.data_path.main_bus = OUTPUT_PORT_ADDRESS
         self.data_path.signal_latch_ar()
         self.tick()
@@ -295,19 +299,20 @@ class ControlUnit:
             match opcode:
                 case Opcode.JMP:
                     if args[3] in Register:
-                        reg = args[3]
-                        self.data_path.main_bus = self.data_path.alu.process(reg, Register.R0, Opcode.JMP)
+                        register = args[3]
+                        value = self.data_path.sel_register(register)
+                        self.data_path.main_bus = self.data_path.alu.process(value, self.data_path.registers[0], Opcode.JMP)
                         self.tick()
 
-                    sel_next = SignalIP.JMP_REG if args[3] == Register.RR.reg_name else SignalIP.NEXT_IP
+                    sel_next = SignalIP.JMP_REG if args[3] == Register.RR else SignalIP.JMP_LABEL
                 case Opcode.JZ:
-                    sel_next = SignalIP.JMP_LABEL if not self.data_path.is_zero() else SignalIP.NEXT_IP
-                case Opcode.JNZ:
                     sel_next = SignalIP.JMP_LABEL if self.data_path.is_zero() else SignalIP.NEXT_IP
+                case Opcode.JNZ:
+                    sel_next = SignalIP.JMP_LABEL if not self.data_path.is_zero() else SignalIP.NEXT_IP
                 case Opcode.JN:
-                    sel_next = SignalIP.JMP_LABEL if not self.data_path.is_negative() else SignalIP.NEXT_IP
-                case Opcode.JNN:
                     sel_next = SignalIP.JMP_LABEL if self.data_path.is_negative() else SignalIP.NEXT_IP
+                case Opcode.JNN:
+                    sel_next = SignalIP.JMP_LABEL if not self.data_path.is_negative() else SignalIP.NEXT_IP
                 case _:
                     logging.warning("Unknown jump opcode %s", opcode)
 
@@ -330,7 +335,9 @@ class ControlUnit:
 
         instruction_executor = self.instruction_executors[opcode]
         instruction_executor(opcode, args)
+
         self.signal_latch_ip(sel_next=SignalIP.NEXT_IP)
+        self.tick()
 
     def __repr__(self):
         pass
@@ -340,12 +347,12 @@ def simulation(memory, input_tokens):
     control_unit = ControlUnit(memory, data_path)
     instr_counter = 0
 
-    logging.debug("%s", control_unit)
+    # logging.debug("%s", control_unit)
     try:
         while instr_counter < INSTRUCTION_LIMIT:
             control_unit.decode_and_execute_instruction()
             instr_counter += 1
-            logging.debug("%s", control_unit)
+            # logging.debug("%s", control_unit)
     except EOFError:
         logging.warning("Input buffer is empty!")
     except StopIteration:
@@ -358,8 +365,6 @@ def simulation(memory, input_tokens):
 
 def main(code_file, input_file):
     memory = read_code(code_file)
-    # for cell in memory:
-    #     print(cell)
     for index in range(len(memory), MEMORY_SIZE): # дополняем память пустыми ячейками до предела
         memory.append({"index": index, "name": "", "args": []})
 
@@ -368,10 +373,9 @@ def main(code_file, input_file):
         input_token = []
         for char in input_text:
             input_token.append(char)
+        input_token.append('\0')
 
-    # output, instr_counter, ticks = "", 0, 0 #simulation(memory, input_tokens=input_token)
     output, instr_counter, ticks = simulation(memory, input_tokens=input_token)
-
 
     print("".join(output))
     print("instr_counter: ", instr_counter, "ticks: ", ticks)

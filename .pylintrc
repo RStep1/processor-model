@@ -1,0 +1,10 @@
+[MASTER]
+jobs=4 #number of processes to use
+disable=C0115, C0116 # missing-module-docstring
+
+[BASIC]
+good-names=processor-model #names to be considered ok
+
+[pre-commit-hook]
+command=run_pylint
+disable=E0401, C0301

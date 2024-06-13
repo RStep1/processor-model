@@ -8,7 +8,7 @@ section .data:
 
 section .text:
     .start:
-        li r1, request_ptr ; print request
+        li r1, request_ptr  ; print request
         call .print_string
         call .new_line
 
@@ -25,7 +25,7 @@ section .text:
 
     .input_username:
         li r1, username_ptr
-        li r2, 0 ; for comparation
+        li r2, 0            ; for comparation with 0-terminator
         .loop2:
             input r0
             cmp r0, r2
@@ -36,13 +36,13 @@ section .text:
         .end_input:
             ret
 
-    .print_string: ; r1 - pointer on str
-        li r2, 0 ; for comparation
+    .print_string:          ; r1 - pointer on str
+        li r2, 0            ; for comparation with 0-terminator
         .loop:
             ld r0, r1
-            output r0
             cmp r0, r2
             jz .end
+            output r0
             inc r1
             jmp .loop
         .end:

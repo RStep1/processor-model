@@ -1,7 +1,7 @@
 section .data:
 section .text:
     .start:
-        li r1, 0 ; for comparation
+        li r1, 0    ; 0-terminator
     .loop:
         input r0
         cmp r0, r1

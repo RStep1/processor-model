@@ -159,7 +159,5 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-codes/
-Makefile
 algorithms/test_all_commands.asm
 .vscode/

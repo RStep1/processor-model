@@ -1,0 +1,214 @@
+[
+    {
+        "index": 0,
+        "name": "jmp",
+        "args": [
+            null,
+            null,
+            null,
+            "17"
+        ]
+    },
+    {
+        "index": 1,
+        "name": "input_port",
+        "args": [
+            0
+        ]
+    },
+    {
+        "index": 2,
+        "name": "output_port",
+        "args": [
+            0
+        ]
+    },
+    {
+        "index": 3,
+        "name": "greeting",
+        "args": [
+            72
+        ]
+    },
+    {
+        "index": 4,
+        "name": "greeting",
+        "args": [
+            101
+        ]
+    },
+    {
+        "index": 5,
+        "name": "greeting",
+        "args": [
+            108
+        ]
+    },
+    {
+        "index": 6,
+        "name": "greeting",
+        "args": [
+            108
+        ]
+    },
+    {
+        "index": 7,
+        "name": "greeting",
+        "args": [
+            111
+        ]
+    },
+    {
+        "index": 8,
+        "name": "greeting",
+        "args": [
+            32
+        ]
+    },
+    {
+        "index": 9,
+        "name": "greeting",
+        "args": [
+            87
+        ]
+    },
+    {
+        "index": 10,
+        "name": "greeting",
+        "args": [
+            111
+        ]
+    },
+    {
+        "index": 11,
+        "name": "greeting",
+        "args": [
+            114
+        ]
+    },
+    {
+        "index": 12,
+        "name": "greeting",
+        "args": [
+            108
+        ]
+    },
+    {
+        "index": 13,
+        "name": "greeting",
+        "args": [
+            100
+        ]
+    },
+    {
+        "index": 14,
+        "name": "greeting",
+        "args": [
+            33
+        ]
+    },
+    {
+        "index": 15,
+        "name": "greeting",
+        "args": [
+            0
+        ]
+    },
+    {
+        "index": 16,
+        "name": "ptr",
+        "args": [
+            3
+        ]
+    },
+    {
+        "index": 17,
+        "name": "li",
+        "args": [
+            "r1",
+            null,
+            null,
+            "3"
+        ]
+    },
+    {
+        "index": 18,
+        "name": "li",
+        "args": [
+            "r2",
+            null,
+            null,
+            "0"
+        ]
+    },
+    {
+        "index": 19,
+        "name": "ld",
+        "args": [
+            "r0",
+            null,
+            null,
+            "r1"
+        ]
+    },
+    {
+        "index": 20,
+        "name": "cmp",
+        "args": [
+            "r0",
+            "r2",
+            null,
+            null
+        ]
+    },
+    {
+        "index": 21,
+        "name": "jz",
+        "args": [
+            null,
+            null,
+            null,
+            "25"
+        ]
+    },
+    {
+        "index": 22,
+        "name": "output",
+        "args": [
+            "r0",
+            null,
+            null,
+            null
+        ]
+    },
+    {
+        "index": 23,
+        "name": "inc",
+        "args": [
+            "r1",
+            null,
+            null,
+            null
+        ]
+    },
+    {
+        "index": 24,
+        "name": "jmp",
+        "args": [
+            null,
+            null,
+            null,
+            "19"
+        ]
+    },
+    {
+        "index": 25,
+        "name": "halt",
+        "args": [
+            null,
+            null,
+            null,
+            null
+        ]
+    }
+]

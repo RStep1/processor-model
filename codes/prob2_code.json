@@ -1,0 +1,600 @@
+[
+    {
+        "index": 0,
+        "name": "jmp",
+        "args": [
+            null,
+            null,
+            null,
+            "5"
+        ]
+    },
+    {
+        "index": 1,
+        "name": "input_port",
+        "args": [
+            0
+        ]
+    },
+    {
+        "index": 2,
+        "name": "output_port",
+        "args": [
+            0
+        ]
+    },
+    {
+        "index": 3,
+        "name": "LIMIT_VALUE",
+        "args": [
+            4000000
+        ]
+    },
+    {
+        "index": 4,
+        "name": "DIVIDER",
+        "args": [
+            2
+        ]
+    },
+    {
+        "index": 5,
+        "name": "li",
+        "args": [
+            "r4",
+            null,
+            null,
+            "0"
+        ]
+    },
+    {
+        "index": 6,
+        "name": "li",
+        "args": [
+            "r0",
+            null,
+            null,
+            "1"
+        ]
+    },
+    {
+        "index": 7,
+        "name": "mov",
+        "args": [
+            "r1",
+            "r0",
+            null,
+            null
+        ]
+    },
+    {
+        "index": 8,
+        "name": "dec",
+        "args": [
+            "sp",
+            null,
+            null,
+            null
+        ]
+    },
+    {
+        "index": 9,
+        "name": "store",
+        "args": [
+            "ip",
+            null,
+            null,
+            "sp"
+        ]
+    },
+    {
+        "index": 10,
+        "name": "jmp",
+        "args": [
+            null,
+            null,
+            null,
+            "29"
+        ]
+    },
+    {
+        "index": 11,
+        "name": "li",
+        "args": [
+            "r1",
+            null,
+            null,
+            "2"
+        ]
+    },
+    {
+        "index": 12,
+        "name": "dec",
+        "args": [
+            "sp",
+            null,
+            null,
+            null
+        ]
+    },
+    {
+        "index": 13,
+        "name": "store",
+        "args": [
+            "ip",
+            null,
+            null,
+            "sp"
+        ]
+    },
+    {
+        "index": 14,
+        "name": "jmp",
+        "args": [
+            null,
+            null,
+            null,
+            "29"
+        ]
+    },
+    {
+        "index": 15,
+        "name": "add",
+        "args": [
+            "r2",
+            "r1",
+            "r0",
+            null
+        ]
+    },
+    {
+        "index": 16,
+        "name": "mov",
+        "args": [
+            "r0",
+            "r1",
+            null,
+            null
+        ]
+    },
+    {
+        "index": 17,
+        "name": "mov",
+        "args": [
+            "r1",
+            "r2",
+            null,
+            null
+        ]
+    },
+    {
+        "index": 18,
+        "name": "li",
+        "args": [
+            "r5",
+            null,
+            null,
+            "4000000"
+        ]
+    },
+    {
+        "index": 19,
+        "name": "cmp",
+        "args": [
+            "r5",
+            "r1",
+            null,
+            null
+        ]
+    },
+    {
+        "index": 20,
+        "name": "jn",
+        "args": [
+            null,
+            null,
+            null,
+            "25"
+        ]
+    },
+    {
+        "index": 21,
+        "name": "dec",
+        "args": [
+            "sp",
+            null,
+            null,
+            null
+        ]
+    },
+    {
+        "index": 22,
+        "name": "store",
+        "args": [
+            "ip",
+            null,
+            null,
+            "sp"
+        ]
+    },
+    {
+        "index": 23,
+        "name": "jmp",
+        "args": [
+            null,
+            null,
+            null,
+            "29"
+        ]
+    },
+    {
+        "index": 24,
+        "name": "jmp",
+        "args": [
+            null,
+            null,
+            null,
+            "15"
+        ]
+    },
+    {
+        "index": 25,
+        "name": "dec",
+        "args": [
+            "sp",
+            null,
+            null,
+            null
+        ]
+    },
+    {
+        "index": 26,
+        "name": "store",
+        "args": [
+            "ip",
+            null,
+            null,
+            "sp"
+        ]
+    },
+    {
+        "index": 27,
+        "name": "jmp",
+        "args": [
+            null,
+            null,
+            null,
+            "40"
+        ]
+    },
+    {
+        "index": 28,
+        "name": "halt",
+        "args": [
+            null,
+            null,
+            null,
+            null
+        ]
+    },
+    {
+        "index": 29,
+        "name": "li",
+        "args": [
+            "r5",
+            null,
+            null,
+            "2"
+        ]
+    },
+    {
+        "index": 30,
+        "name": "mod",
+        "args": [
+            "r3",
+            "r1",
+            "r5",
+            null
+        ]
+    },
+    {
+        "index": 31,
+        "name": "li",
+        "args": [
+            "r6",
+            null,
+            null,
+            "0"
+        ]
+    },
+    {
+        "index": 32,
+        "name": "cmp",
+        "args": [
+            "r3",
+            "r6",
+            null,
+            null
+        ]
+    },
+    {
+        "index": 33,
+        "name": "jnz",
+        "args": [
+            null,
+            null,
+            null,
+            "35"
+        ]
+    },
+    {
+        "index": 34,
+        "name": "add",
+        "args": [
+            "r4",
+            "r4",
+            "r1",
+            null
+        ]
+    },
+    {
+        "index": 35,
+        "name": "ld",
+        "args": [
+            "rr",
+            null,
+            null,
+            "sp"
+        ]
+    },
+    {
+        "index": 36,
+        "name": "inc",
+        "args": [
+            "sp",
+            null,
+            null,
+            null
+        ]
+    },
+    {
+        "index": 37,
+        "name": "inc",
+        "args": [
+            "rr",
+            null,
+            null,
+            null
+        ]
+    },
+    {
+        "index": 38,
+        "name": "inc",
+        "args": [
+            "rr",
+            null,
+            null,
+            null
+        ]
+    },
+    {
+        "index": 39,
+        "name": "jmp",
+        "args": [
+            null,
+            null,
+            null,
+            "rr"
+        ]
+    },
+    {
+        "index": 40,
+        "name": "li",
+        "args": [
+            "r0",
+            null,
+            null,
+            "1"
+        ]
+    },
+    {
+        "index": 41,
+        "name": "li",
+        "args": [
+            "r2",
+            null,
+            null,
+            "10"
+        ]
+    },
+    {
+        "index": 42,
+        "name": "mul",
+        "args": [
+            "r0",
+            "r0",
+            "r2",
+            null
+        ]
+    },
+    {
+        "index": 43,
+        "name": "cmp",
+        "args": [
+            "r4",
+            "r0",
+            null,
+            null
+        ]
+    },
+    {
+        "index": 44,
+        "name": "jnn",
+        "args": [
+            null,
+            null,
+            null,
+            "42"
+        ]
+    },
+    {
+        "index": 45,
+        "name": "div",
+        "args": [
+            "r0",
+            "r0",
+            "r2",
+            null
+        ]
+    },
+    {
+        "index": 46,
+        "name": "li",
+        "args": [
+            "r1",
+            null,
+            null,
+            "48"
+        ]
+    },
+    {
+        "index": 47,
+        "name": "div",
+        "args": [
+            "r3",
+            "r4",
+            "r0",
+            null
+        ]
+    },
+    {
+        "index": 48,
+        "name": "add",
+        "args": [
+            "r3",
+            "r3",
+            "r1",
+            null
+        ]
+    },
+    {
+        "index": 49,
+        "name": "mod",
+        "args": [
+            "r4",
+            "r4",
+            "r0",
+            null
+        ]
+    },
+    {
+        "index": 50,
+        "name": "div",
+        "args": [
+            "r0",
+            "r0",
+            "r2",
+            null
+        ]
+    },
+    {
+        "index": 51,
+        "name": "output",
+        "args": [
+            "r3",
+            null,
+            null,
+            null
+        ]
+    },
+    {
+        "index": 52,
+        "name": "li",
+        "args": [
+            "r5",
+            null,
+            null,
+            "0"
+        ]
+    },
+    {
+        "index": 53,
+        "name": "cmp",
+        "args": [
+            "r0",
+            "r5",
+            null,
+            null
+        ]
+    },
+    {
+        "index": 54,
+        "name": "jz",
+        "args": [
+            null,
+            null,
+            null,
+            "56"
+        ]
+    },
+    {
+        "index": 55,
+        "name": "jmp",
+        "args": [
+            null,
+            null,
+            null,
+            "47"
+        ]
+    },
+    {
+        "index": 56,
+        "name": "ld",
+        "args": [
+            "rr",
+            null,
+            null,
+            "sp"
+        ]
+    },
+    {
+        "index": 57,
+        "name": "inc",
+        "args": [
+            "sp",
+            null,
+            null,
+            null
+        ]
+    },
+    {
+        "index": 58,
+        "name": "inc",
+        "args": [
+            "rr",
+            null,
+            null,
+            null
+        ]
+    },
+    {
+        "index": 59,
+        "name": "inc",
+        "args": [
+            "rr",
+            null,
+            null,
+            null
+        ]
+    },
+    {
+        "index": 60,
+        "name": "jmp",
+        "args": [
+            null,
+            null,
+            null,
+            "rr"
+        ]
+    }
+]

@@ -13,27 +13,41 @@
 - { ... }- -- повторение 1 или несколько раз
 
 ```copy
-program ::= { line }
+program ::= { section }
 
-line ::= label [ comment ] "\n"
-       | instr [ comment ] "\n"
-       | [ comment ] "\n"
+section ::= data_section | text_section
+
+data_section ::= "section .data:" "\n" { data_line }
+text_section ::= "section .text:" "\n" { text_line }
+
+data_line ::= label_name ":" data_value "\n"
+
+data_value ::= integer
+             | string
+             | label_name
+             | buffer
+
+buffer ::= "bf" integer
+
+text_line ::= label [ comment ] "\n"
+            | instr [ comment ] "\n"
+            | [ comment ] "\n"
 
 label ::= label_name ":"
 
 instr ::= op0
-        | op1 register, (register, address | integer)
+        | op1 register, (register | address)
         | op2 register, register, register
-        | op3 label_name
+        | op3 (label_name | register)
         | op4 register
         | op5 register, register
+        | op6 register, integer
 
 op0 ::= "halt"
       | "ret"
 
 op1 ::= "store"
       | "ld"
-      | "li"
 
 op2 ::= "add"
       | "sub"
@@ -58,15 +72,20 @@ op4 ::= "inc"
 op5 ::= "cmp"
       | "mov"
 
-register ::= "r" {<any of "0-9">}-
+op6 ::= "li"
 
-integer ::= "#" [ "-" ] { <any of "0-9"> }-
+register ::= "r" { <any of "0-9"> }-
 
-address ::= <any of *> { <any of "0-9"> }
+integer ::= [ "-" ] { <any of "0-9"> }-
 
-label_name ::= <any of "a-z A-Z_"> { <any of "a-z A-Z 0-9 _"> }
+address ::= "*" { <any of "0-9"> }
 
-comment ::= ";" <any symbols except "\n">
+label_name ::= <any of "a-zA-Z_"> { <any of "a-zA-Z0-9_"> }
+
+string ::= "\"" { <any of "a-zA-Z0-9_ "> } "\""
+
+comment ::= ";" { <any symbol except "\n"> }
+
 ```
 
 **Операции**\
@@ -176,7 +195,7 @@ jmp .label   ; --> `jmp 123`, где 123 - номер инструкции по�
 
 - Загрузка и сохранение данных регистров реализованы на отдельных шинах.
 
-- Поток управления: 
+- Поток управления:
   - инкремент `IP` после каждой инструкции
   - переходы на инструкции осуществляются инструкциями перехода и командой `call`
 
@@ -194,7 +213,7 @@ jmp .label   ; --> `jmp 123`, где 123 - номер инструкции по�
 | store     | 2                  |
 | ld        | 2                  |
 | li        | 1                  |
-| jmp       | 1                  |
+| jmp       | 1 (2, если аргумент - регистр)|
 | jz        | 1                  |
 | jnz       | 1                  |
 | jn        | 1                  |
@@ -202,9 +221,9 @@ jmp .label   ; --> `jmp 123`, где 123 - номер инструкции по�
 | push      | 3                  |
 | pop       | 3                  |
 | call      | 4                  |
-| ret       | 3                  |
-| input     | 1                  |
-| output    | 1                  |
+| ret       | 6                  |
+| input     | 2                  |
+| output    | 2                  |
 | cmp       | 1                  |
 | mov       | 2                  |
 | halt      | 0                  |
@@ -213,18 +232,21 @@ jmp .label   ; --> `jmp 123`, где 123 - номер инструкции по�
 
 Команды `call`, `ret`, `push` и `pop` транслируются в машинный код специальным оразом (остальные транслируются однозначно):
 
-- `call .subroutine` -> 
+- `call .subroutine` ->
   1. `dec sp`
   2. `st ip, sp`
   3. `jmp .subroutine`
 - `ret` ->
-  1. `ld ip, sp`
+  1. `ld rr, sp`
   2. `inc sp`
+  3. `inc rr`
+  4. `inc rr`
+  5. `jmp rr`
 - `push r0` ->
   1. `dec sp`
   2. `st r0, sp`
 - `pop r0` ->
-  1. `ld reg, sp`
+  1. `ld r0, sp`
   2. `inc sp`
 
 ### Кодирование инструкций

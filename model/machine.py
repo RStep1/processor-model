@@ -121,8 +121,8 @@ class DataPath:
                 index = GENERAL_PURPOSE_REGISTERS.index(register)
                 self.registers[index] = self.main_bus
             case _:
-                raise ValueError(f"Inaccessible or non-existent register {register}")
-    
+                logging.warning("Inaccessible or non-existent register %s", register)
+
     def signal_latch_ar(self):
         self.ar = self.main_bus
 
@@ -138,7 +138,7 @@ class DataPath:
                 index = GENERAL_PURPOSE_REGISTERS.index(register)
                 return self.registers[index]
             case _:
-                raise ValueError(f"Inaccessible or non-existent register {register}")
+                logging.warning("Inaccessible or non-existent register %s", register)
 
 
 class ControlUnit:
@@ -340,19 +340,39 @@ class ControlUnit:
         self.tick()
 
     def __repr__(self):
-        pass
+        state_repr = "TICK: {:4} IP: {:3} AR: {:4} SP: {:3} RR {:3} GPR: {} MEM_OUT: {}".format(
+            self._tick,
+            self.data_path.ip,
+            self.data_path.ar,
+            self.data_path.sp,
+            self.data_path.rr,
+            self.data_path.registers,
+            get_cell_value(self.data_path.memory[self.data_path.ar]),
+        )
+
+        instr = self.memory[self.data_path.ip]
+        opcode = instr["name"]
+        instr_repr = f"{str(opcode):6}"
+
+        for arg in instr["args"]:
+            if arg in Register:
+                arg = arg.reg_name
+            if arg is not None:
+                instr_repr += f" {arg}"
+
+        return f"{state_repr} \t{instr_repr}"
 
 def simulation(memory, input_tokens):
     data_path = DataPath(memory, input_tokens)
     control_unit = ControlUnit(memory, data_path)
     instr_counter = 0
 
-    # logging.debug("%s", control_unit)
+    logging.debug("%s", control_unit)
     try:
         while instr_counter < INSTRUCTION_LIMIT:
             control_unit.decode_and_execute_instruction()
             instr_counter += 1
-            # logging.debug("%s", control_unit)
+            logging.debug("%s", control_unit)
     except EOFError:
         logging.warning("Input buffer is empty!")
     except StopIteration:
@@ -378,7 +398,7 @@ def main(code_file, input_file):
     output, instr_counter, ticks = simulation(memory, input_tokens=input_token)
 
     print("".join(output))
-    print("instr_counter: ", instr_counter, "ticks: ", ticks)
+    print("instr_counter:", instr_counter, "ticks:", ticks)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,10 @@
-import sys, json, re
+import sys
+import json
+import re
 
-from isa import Opcode, Variable, write_code, is_register, INPUT_PORT_ADDRESS, OUTPUT_PORT_ADDRESS, MIN_NUMBER, MAX_NUMBER, MEMORY_SIZE
+from isa import Opcode, Variable, write_code, is_register, \
+                INPUT_PORT_ADDRESS, OUTPUT_PORT_ADDRESS, \
+                MIN_NUMBER, MAX_NUMBER, MEMORY_SIZE
 from machine import Register, is_jump_command
 
 SECTION_DATA = "section .data:"
@@ -134,7 +138,7 @@ def translate_section_text_stage_1(section_text, address, code):
 
 def translate_section_text_stage_2(labels, variables, code, section_text_address):
     for index, instruction in enumerate(code):
-        if index > 0 and index < section_text_address: # пропускаем секцию .data и первую инструкцию
+        if index != 0 and index < section_text_address: # пропускаем секцию .data и первую инструкцию
             continue
         fourth_arg = instruction["args"][3]
         if fourth_arg is None:
@@ -195,12 +199,11 @@ def translate_section_data(section_data):
     def get_value_type(value):
         if is_integer(value):
             return 'integer'
-        elif is_string(value):
+        if is_string(value):
             return 'string'
-        elif value.startswith("bf"):
+        if value.startswith("bf"):
             return 'buffer'
-        else:
-            return 'reference'
+        return 'reference'
 
     for line in section_data.splitlines():
         name, value = parse_line(line)

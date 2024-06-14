@@ -1,6 +1,6 @@
-from enum import Enum
+import sys
+import logging
 from isa import MEMORY_SIZE, Opcode, Register, read_code, MAX_NUMBER, MIN_NUMBER, INPUT_PORT_ADDRESS, OUTPUT_PORT_ADDRESS
-import logging, sys
 
 REGISTER_AMOUNT = 8
 INSTRUCTION_LIMIT = 2000

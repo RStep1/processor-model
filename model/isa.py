@@ -25,7 +25,7 @@ class Register(Enum):
 
     def __str__(self):
         return f"{self.reg_name}"
-    
+
 def is_register(arg):
     return any(arg == register.value for register in Register)
 
@@ -35,13 +35,13 @@ def build_register_object(reg_name):
 def read_code(filename):
     with open(filename, encoding="utf-8") as file:
         code = json.loads(file.read())
-    
+
     for instr in code:
         for arg in instr["args"]:
             if is_register(arg):
                 arg_idx = instr["args"].index(arg)
                 code[instr["index"]]["args"][arg_idx] = build_register_object(arg)
-    
+
     return code
 
 def write_code(filename: str, code: str):

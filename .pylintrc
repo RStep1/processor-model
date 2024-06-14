@@ -7,4 +7,4 @@ good-names=processor-model #names to be considered ok
 
 [pre-commit-hook]
 command=run_pylint
-disable=E0401, C0301
+disable=E0401, C0301, E0015

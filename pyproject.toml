@@ -3,7 +3,6 @@ name = "processor-model"
 version = "0.1.1"
 description = ""
 authors = ["RStep1 <stepanrykov.itmo@gmail.com>"]
-license = "BSD"
 readme = "README.md"
 
 [tool.poetry.dependencies]

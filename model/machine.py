@@ -1,23 +1,45 @@
 import sys
 import logging
-from isa import MEMORY_SIZE, Opcode, Register, read_code, MAX_NUMBER, MIN_NUMBER, INPUT_PORT_ADDRESS, OUTPUT_PORT_ADDRESS
+from typing import Final
+from isa import (
+    MEMORY_SIZE,
+    Opcode,
+    Register,
+    read_code,
+    MAX_NUMBER,
+    MIN_NUMBER,
+    INPUT_PORT_ADDRESS,
+    OUTPUT_PORT_ADDRESS,
+)
 
 REGISTER_AMOUNT = 8
 INSTRUCTION_LIMIT = 2000
 
-GENERAL_PURPOSE_REGISTERS = [Register.R0, Register.R1, Register.R2, Register.R3,
-                             Register.R4, Register.R5, Register.R6, Register.R7]
+GENERAL_PURPOSE_REGISTERS = [
+    Register.R0,
+    Register.R1,
+    Register.R2,
+    Register.R3,
+    Register.R4,
+    Register.R5,
+    Register.R6,
+    Register.R7,
+]
+
 
 def is_jump_command(command):
     return command in [Opcode.JMP, Opcode.JZ, Opcode.JNZ, Opcode.JN, Opcode.JNN]
 
+
 def get_cell_value(cell):
     return cell["args"][0]
+
 
 class SignalIP:
     NEXT_IP = "next_ip"
     JMP_LABEL = "jmp_label"
     JMP_REG = "jmp_reg"
+
 
 class ALU:
     z_flag = None
@@ -27,7 +49,7 @@ class ALU:
         self.z_flag = 0
         self.n_flag = 0
 
-    alu_opcode_binary_handlers = {
+    ALU_OPCODE_BINARY_HANDLERS: Final = {
         Opcode.ADD: lambda left, right: int(left + right),
         Opcode.SUB: lambda left, right: int(left - right),
         Opcode.MUL: lambda left, right: int(left * right),
@@ -36,25 +58,25 @@ class ALU:
         Opcode.CMP: lambda left, right: int(left - right),
     }
 
-    alu_opcode_unary_handlers = {
+    ALU_OPCODE_UNARY_HANDLERS: Final = {
         Opcode.INC: lambda left: left + 1,
         Opcode.DEC: lambda left: left - 1,
-        Opcode.MOV: lambda left: left,   # -|
-        Opcode.LD: lambda left: left,    #  | поместить значение регистра на главную шину, выставить флаги
-        Opcode.ST: lambda left: left,    #  |
-        Opcode.JMP: lambda left: left,   # -|
+        Opcode.MOV: lambda left: left,  # поместить значение регистра
+        Opcode.LD: lambda left: left,  # на главную шину, выставить флаги
+        Opcode.ST: lambda left: left,
+        Opcode.JMP: lambda left: left,
     }
 
     def process(self, left: int, right: int, opcode: Opcode) -> int:
         assert (
-            opcode in self.alu_opcode_binary_handlers or opcode in self.alu_opcode_unary_handlers
+            opcode in self.ALU_OPCODE_BINARY_HANDLERS or opcode in self.ALU_OPCODE_UNARY_HANDLERS
         ), f"Unknown ALU command {opcode.value}"
 
-        if opcode in self.alu_opcode_binary_handlers:
-            handler = self.alu_opcode_binary_handlers[opcode]
+        if opcode in self.ALU_OPCODE_BINARY_HANDLERS:
+            handler = self.ALU_OPCODE_BINARY_HANDLERS[opcode]
             value = handler(left, right)
         else:
-            handler = self.alu_opcode_unary_handlers[opcode]
+            handler = self.ALU_OPCODE_UNARY_HANDLERS[opcode]
             value = handler(left)
         value = self.handle_overflow(value)
         self.set_flags(value)
@@ -70,6 +92,7 @@ class ALU:
     def set_flags(self, value) -> None:
         self.z_flag = value == 0
         self.n_flag = value < 0
+
 
 class DataPath:
     input_buffer = None
@@ -139,6 +162,7 @@ class DataPath:
                 return self.registers[index]
             case _:
                 logging.warning("Inaccessible or non-existent register %s", register)
+                return 0
 
 
 class ControlUnit:
@@ -149,10 +173,10 @@ class ControlUnit:
         self.instruction_executors = {
             Opcode.INC: self.execute_unary_math_instruction,
             Opcode.DEC: self.execute_unary_math_instruction,
-            Opcode.LD:  self.execute_load,
-            Opcode.LI:  self.execute_load_immediately,
-            Opcode.ST:  self.execute_store,
-            Opcode.IN:  self.execute_input,
+            Opcode.LD: self.execute_load,
+            Opcode.LI: self.execute_load_immediately,
+            Opcode.ST: self.execute_store,
+            Opcode.IN: self.execute_input,
             Opcode.OUT: self.execute_output,
             Opcode.ADD: self.execute_binary_math_instruction,
             Opcode.SUB: self.execute_binary_math_instruction,
@@ -305,7 +329,9 @@ class ControlUnit:
                     if args[3] in Register:
                         register = args[3]
                         value = self.data_path.sel_register(register)
-                        self.data_path.main_bus = self.data_path.alu.process(value, self.data_path.registers[0], Opcode.JMP)
+                        self.data_path.main_bus = self.data_path.alu.process(
+                            value, self.data_path.registers[0], Opcode.JMP
+                        )
                         self.tick()
 
                     sel_next = SignalIP.JMP_REG if args[3] == Register.RR else SignalIP.JMP_LABEL
@@ -326,7 +352,6 @@ class ControlUnit:
             return True
 
         return False
-
 
     def decode_and_execute_instruction(self):
         instr = self.data_path.signal_read_memory(self.data_path.ip)
@@ -368,6 +393,7 @@ class ControlUnit:
 
         return f"{state_repr} \t{instr_repr}"
 
+
 def simulation(memory, input_tokens):
     data_path = DataPath(memory, input_tokens)
     control_unit = ControlUnit(memory, data_path)
@@ -389,9 +415,10 @@ def simulation(memory, input_tokens):
     logging.info("output_buffer: %s", repr("".join(data_path.output_buffer)))
     return "".join(data_path.output_buffer), instr_counter, control_unit.current_tick()
 
+
 def main(code_file, input_file):
     memory = read_code(code_file)
-    for index in range(len(memory), MEMORY_SIZE): # дополняем память пустыми ячейками до предела
+    for index in range(len(memory), MEMORY_SIZE):  # дополняем память пустыми ячейками до предела
         memory.append({"index": index, "name": "", "args": []})
 
     with open(input_file, encoding="utf-8") as file:
@@ -399,7 +426,7 @@ def main(code_file, input_file):
         input_token = []
         for char in input_text:
             input_token.append(char)
-        input_token.append('\0')
+        input_token.append("\0")
 
     output, instr_counter, ticks = simulation(memory, input_tokens=input_token)
 

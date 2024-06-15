@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "processor-model"
+name = "processor_model"
 version = "0.1.1"
 description = ""
 authors = ["RStep1 <stepanrykov.itmo@gmail.com>"]

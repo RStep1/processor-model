@@ -1,5 +1,5 @@
-from enum import Enum
 import json
+from enum import Enum
 
 MEMORY_SIZE = 2048
 MAX_NUMBER = 1 << 31 - 1

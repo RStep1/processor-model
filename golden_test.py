@@ -9,7 +9,7 @@ import pytest
 import translator
 
 
-@pytest.mark.golden_test("../golden/*.yml")
+@pytest.mark.golden_test("./golden/*.yml")
 def test_translator_asm_and_machine(golden, caplog):
     caplog.set_level(logging.DEBUG)
 

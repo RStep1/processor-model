@@ -2,8 +2,8 @@ ALGO_DIR = ./algorithms
 CODE_DIR = ./codes
 INPUT_DIR = ./input_files
 
-TRANSLATOR = python ./model/translator.py
-MACHINE = python model/machine.py
+TRANSLATOR = python ./translator.py
+MACHINE = python ./machine.py
 
 INPUT_EMPTY = $(INPUT_DIR)/empty_input
 INPUT_CAT = $(INPUT_DIR)/cat_input
@@ -67,16 +67,16 @@ clean:
 # poetry:
 
 format:
-	poetry run ruff format ./model
+	poetry run ruff format .
 
 lint:
-	poetry run ruff check ./model
+	poetry run ruff check .
 
 test:
 	poetry run pytest -v
 
 test-update-golden:
-	poetry run pytest ./model -v --update-goldens
+	poetry run pytest . -v --update-goldens
 
 
 .PHONY: translate_all run_all translate_cat translate_hello_username \

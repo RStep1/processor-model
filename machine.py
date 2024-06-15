@@ -1,15 +1,16 @@
-import sys
 import logging
+import sys
 from typing import Final
+
 from isa import (
+    INPUT_PORT_ADDRESS,
+    MAX_NUMBER,
     MEMORY_SIZE,
+    MIN_NUMBER,
+    OUTPUT_PORT_ADDRESS,
     Opcode,
     Register,
     read_code,
-    MAX_NUMBER,
-    MIN_NUMBER,
-    INPUT_PORT_ADDRESS,
-    OUTPUT_PORT_ADDRESS,
 )
 
 REGISTER_AMOUNT = 8
@@ -211,7 +212,8 @@ class ControlUnit:
         self.tick()
 
     def execute_store(self, opcode, args):
-        if args[3] in Register:
+        # if args[3] is not str and args[3].value in [register.value for register in Register]:
+        if isinstance(args[3], Register):
             left = self.data_path.sel_register(args[3])
             self.data_path.main_bus = self.data_path.alu.process(left, self.data_path.registers[0], opcode)
         else:
@@ -226,7 +228,7 @@ class ControlUnit:
         self.tick()
 
     def execute_load(self, opcode, args):
-        if args[3] in Register:
+        if isinstance(args[3], Register):
             left = self.data_path.sel_register(args[3])
             self.data_path.main_bus = self.data_path.alu.process(left, self.data_path.registers[0], opcode)
         else:
@@ -326,7 +328,7 @@ class ControlUnit:
             sel_next = SignalIP.NEXT_IP
             match opcode:
                 case Opcode.JMP:
-                    if args[3] in Register:
+                    if isinstance(args[3], Register):
                         register = args[3]
                         value = self.data_path.sel_register(register)
                         self.data_path.main_bus = self.data_path.alu.process(
@@ -383,10 +385,10 @@ class ControlUnit:
 
         instr = self.memory[self.data_path.ip]
         opcode = instr["name"]
-        instr_repr = f"{str(opcode):6}"
+        instr_repr = f"{opcode!s:6}"
 
         for arg in instr["args"]:
-            if arg in Register:
+            if isinstance(arg, Register):
                 arg = arg.reg_name
             if arg is not None:
                 instr_repr += f" {arg}"

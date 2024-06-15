@@ -2,15 +2,15 @@ import re
 import sys
 
 from isa import (
-    Opcode,
-    Variable,
-    write_code,
-    is_register,
     INPUT_PORT_ADDRESS,
-    OUTPUT_PORT_ADDRESS,
-    MIN_NUMBER,
     MAX_NUMBER,
     MEMORY_SIZE,
+    MIN_NUMBER,
+    OUTPUT_PORT_ADDRESS,
+    Opcode,
+    Variable,
+    is_register,
+    write_code,
 )
 from machine import Register, is_jump_command
 
@@ -42,34 +42,38 @@ def build_json_data(address, var_name, data):
     return {"index": address, "name": var_name, "args": args}
 
 
-def build_json_instruction(address, command, command_args):
-    def build_json_0_args(args, _, __):
-        return args
+def build_json_0_args(args, _, __):
+    return args
 
-    def build_json_1_args(args, command, command_args):
-        if len(command_args) == 1:
-            if is_jump_command(command):
-                args[3] = command_args[0]
-            else:
-                args[0] = command_args[0]
-        return args
 
-    def build_json_2_args(args, command, command_args):
-        args[0] = command_args[0]
-        if is_register(command_args[1]):  # is 2nd arg register
-            if command in [Opcode.ST.value, Opcode.LD.value]:
-                args[3] = command_args[1]
-            else:
-                args[1] = command_args[1]
+def build_json_1_args(args, command, command_args):
+    if len(command_args) == 1:
+        if is_jump_command(command):
+            args[3] = command_args[0]
         else:
+            args[0] = command_args[0]
+    return args
+
+
+def build_json_2_args(args, command, command_args):
+    args[0] = command_args[0]
+    if is_register(command_args[1]):  # is 2nd arg register
+        if command in [Opcode.ST.value, Opcode.LD.value]:
             args[3] = command_args[1]
-        return args
+        else:
+            args[1] = command_args[1]
+    else:
+        args[3] = command_args[1]
+    return args
 
-    def build_json_3_args(args, _, command_args):
-        for i in range(3):
-            args[i] = command_args[i]
-        return args
 
+def build_json_3_args(args, _, command_args):
+    for i in range(3):
+        args[i] = command_args[i]
+    return args
+
+
+def build_json_instruction(address, command, command_args):
     arg_handlers = [
         build_json_0_args,
         build_json_1_args,
@@ -94,6 +98,74 @@ def translate_variables(variables, code):
             code.append(build_json_data(variable.address, variable.name, variable.data))
     return code
 
+def translate_3_args_command(address, command, command_args, code):
+    is_all_regs = True
+    for arg in command_args:
+        if not is_register(arg):
+            is_all_regs = False
+    assert is_all_regs is True, "Arithmetic commands only can take registers as arguments"
+    code.append(build_json_instruction(address, command, command_args))
+    address += 1
+    return address, code
+
+def translate_2_args_command(address, command, command_args, code):
+    code.append(build_json_instruction(address, command, command_args))
+    address += 1
+    return address, code
+
+def translate_1_args_command(address, command, command_args, code):
+    opcode = Opcode(command)
+    match opcode:
+        case Opcode.CALL:
+            code.extend(
+                [
+                    build_json_instruction(address, Opcode.DEC.value, [Register.SP.reg_name]),
+                    build_json_instruction(
+                        address + 1, Opcode.ST.value, [Register.IP.reg_name, Register.SP.reg_name]
+                    ),
+                    build_json_instruction(address + 2, Opcode.JMP.value, [command_args[0]]),
+                ]
+            )
+            address += 3
+        case Opcode.PUSH:
+            code.extend(
+                [
+                    build_json_instruction(address, Opcode.DEC.value, [Register.SP.reg_name]),
+                    build_json_instruction(address + 1, Opcode.ST.value, [command_args[0], Register.SP.reg_name]),
+                ]
+            )
+            address += 2
+        case Opcode.POP:
+            code.extend(
+                [
+                    build_json_instruction(address, Opcode.LD.value, [command_args[0], Register.SP.reg_name]),
+                    build_json_instruction(address + 1, Opcode.INC.value, [Register.SP.reg_name]),
+                ]
+            )
+            address += 2
+        case _:
+            code.append(build_json_instruction(address, command, command_args))
+            address += 1
+    return address, code
+
+def translate_0_args_command(address, command, command_args, code):
+    opcode = Opcode(command)
+    assert opcode in [Opcode.HALT, Opcode.RET], "Only `halt` or `ret` instructions take no arguments"
+    if opcode == Opcode.HALT:
+        code.append(build_json_instruction(address, command, command_args))
+        address += 1
+    else:
+        code.extend(
+            [
+                build_json_instruction(address, Opcode.LD.value, [Register.RR.reg_name, Register.SP.reg_name]),
+                build_json_instruction(address + 1, Opcode.INC.value, [Register.SP.reg_name]),
+                build_json_instruction(address + 2, Opcode.INC.value, [Register.RR.reg_name]),
+                build_json_instruction(address + 3, Opcode.INC.value, [Register.RR.reg_name]),
+                build_json_instruction(address + 4, Opcode.JMP.value, [Register.RR.reg_name]),
+            ]
+        )
+        address += 5
+    return address, code
 
 def translate_section_text_stage_1(section_text, address, code):
     labels = {}
@@ -108,80 +180,17 @@ def translate_section_text_stage_1(section_text, address, code):
             label_name = token.strip(":")
             assert label_name not in labels, f"Redefinition of label_name: {label_name}"
             labels[label_name] = address
-        elif len(command_args) == 3:  # арифметические команды
-            is_all_regs = True
-            for arg in command_args:
-                if not is_register(arg):
-                    is_all_regs = False
-            assert is_all_regs is True, "Arithmetic commands only can take registers as arguments"
-            code.append(build_json_instruction(address, command, command_args))
-            address += 1
-        elif len(command_args) == 2:  # store, load or cmp, move
-            if not is_register(command_args[1]):  # store or load
-                pass  # do some checks
-            code.append(build_json_instruction(address, command, command_args))
-            address += 1
-        elif len(command_args) == 1:  # jmp, jz, jnz, jn, jnn or op4
-            opcode = Opcode(command)
-            if opcode == Opcode.CALL:
-                code.extend(
-                    [
-                        build_json_instruction(address, Opcode.DEC.value, [Register.SP.reg_name]),
-                        build_json_instruction(
-                            address + 1, Opcode.ST.value, [Register.IP.reg_name, Register.SP.reg_name]
-                        ),
-                        build_json_instruction(address + 2, Opcode.JMP.value, [command_args[0]]),
-                    ]
-                )
-                address += 3
-                # dec sp
-                # st ip, sp
-                # jump .loop
-            elif opcode == Opcode.PUSH:
-                # dec sp
-                # st reg, sp
-                code.extend(
-                    [
-                        build_json_instruction(address, Opcode.DEC.value, [Register.SP.reg_name]),
-                        build_json_instruction(address + 1, Opcode.ST.value, [command_args[0], Register.SP.reg_name]),
-                    ]
-                )
-                address += 2
-            elif opcode == Opcode.POP:
-                # ld reg, sp
-                # inc sp
-                code.extend(
-                    [
-                        build_json_instruction(address, Opcode.LD.value, [command_args[0], Register.SP.reg_name]),
-                        build_json_instruction(address + 1, Opcode.INC.value, [Register.SP.reg_name]),
-                    ]
-                )
-                address += 2
-            else:
-                code.append(build_json_instruction(address, command, command_args))
-                address += 1
-        elif len(command_args) == 0:  # halt or ret
-            opcode = Opcode(command)
-            assert opcode in [Opcode.HALT, Opcode.RET], "Only `halt` or `ret` instructions take no arguments"
-            if opcode == Opcode.HALT:
-                code.append(build_json_instruction(address, command, command_args))
-                address += 1
-            else:
-                # ld rr, sp
-                # inc sp
-                # inc rr
-                # inc rr
-                # jmp rr
-                code.extend(
-                    [
-                        build_json_instruction(address, Opcode.LD.value, [Register.RR.reg_name, Register.SP.reg_name]),
-                        build_json_instruction(address + 1, Opcode.INC.value, [Register.SP.reg_name]),
-                        build_json_instruction(address + 2, Opcode.INC.value, [Register.RR.reg_name]),
-                        build_json_instruction(address + 3, Opcode.INC.value, [Register.RR.reg_name]),
-                        build_json_instruction(address + 4, Opcode.JMP.value, [Register.RR.reg_name]),
-                    ]
-                )
-                address += 5
+            continue
+
+        match len(command_args):
+            case 3:
+                address, code = translate_3_args_command(address, command, command_args, code)
+            case 2:
+                address, code = translate_2_args_command(address, command, command_args, code)
+            case 1:
+                address, code = translate_1_args_command(address, command, command_args, code)
+            case 0:
+                address, code = translate_0_args_command(address, command, command_args, code)
 
     return labels, code
 
@@ -209,6 +218,19 @@ def is_string(value: str) -> bool:
     return bool(re.fullmatch(r"^(\".*\")|(\'.*\')$", value))
 
 
+def parse_line(line):
+    name, value = map(str.strip, line.split(":", 1))
+    return name, value
+
+def get_variable_type(value):
+    if is_integer(value):
+        return "integer"
+    if is_string(value):
+        return "string"
+    if value.startswith("bf"):
+        return "buffer"
+    return "reference"
+
 def translate_section_data(section_data):
     variables = {
         "in": Variable("input_port", INPUT_PORT_ADDRESS, [0]),
@@ -216,10 +238,6 @@ def translate_section_data(section_data):
     }
     reference_variables = {}
     address = 3
-
-    def parse_line(line):
-        name, value = map(str.strip, line.split(":", 1))
-        return name, value
 
     def handle_integer(name, value):
         value = int(value)
@@ -249,18 +267,10 @@ def translate_section_data(section_data):
         "reference": handle_reference,
     }
 
-    def get_value_type(value):
-        if is_integer(value):
-            return "integer"
-        if is_string(value):
-            return "string"
-        if value.startswith("bf"):
-            return "buffer"
-        return "reference"
-
     for line in section_data.splitlines():
         name, value = parse_line(line)
-        value_type = get_value_type(value)
+
+        value_type = get_variable_type(value)
         address += handlers[value_type](name, value)
 
     for reference_name, target_name in reference_variables.items():
@@ -280,7 +290,7 @@ def translate(source):
     variables, section_text_address = translate_section_data(section_data)
 
     code = []
-    # добавляем инструкцию безусловного перехода в нулевую ячейку памяти
+    # добавляем инструкцию безусловного перехода на начало программы в нулевую ячейку памяти
     code.append(build_json_instruction(0, Opcode.JMP.value, [START_LABEL]))
 
     code = translate_variables(variables, code)

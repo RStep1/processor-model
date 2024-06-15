@@ -26,7 +26,7 @@ jobs:
 
       - name: Run tests and collect coverage
         run: |
-          poetry run coverage run -m pytest ./model
+          poetry run coverage run -m pytest .
           poetry run coverage report -m
         env:
           CI: true
@@ -50,7 +50,7 @@ jobs:
           poetry install
 
       - name: Check code formatting with Ruff
-        run: poetry run ruff format --check ./model
+        run: poetry run ruff format --check .
 
       - name: Run Ruff linters
-        run: poetry run ruff check ./model
+        run: poetry run ruff check .

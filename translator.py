@@ -98,6 +98,7 @@ def translate_variables(variables, code):
             code.append(build_json_data(variable.address, variable.name, variable.data))
     return code
 
+
 def translate_3_args_command(address, command, command_args, code):
     is_all_regs = True
     for arg in command_args:
@@ -108,10 +109,12 @@ def translate_3_args_command(address, command, command_args, code):
     address += 1
     return address, code
 
+
 def translate_2_args_command(address, command, command_args, code):
     code.append(build_json_instruction(address, command, command_args))
     address += 1
     return address, code
+
 
 def translate_1_args_command(address, command, command_args, code):
     opcode = Opcode(command)
@@ -120,9 +123,7 @@ def translate_1_args_command(address, command, command_args, code):
             code.extend(
                 [
                     build_json_instruction(address, Opcode.DEC.value, [Register.SP.reg_name]),
-                    build_json_instruction(
-                        address + 1, Opcode.ST.value, [Register.IP.reg_name, Register.SP.reg_name]
-                    ),
+                    build_json_instruction(address + 1, Opcode.ST.value, [Register.IP.reg_name, Register.SP.reg_name]),
                     build_json_instruction(address + 2, Opcode.JMP.value, [command_args[0]]),
                 ]
             )
@@ -148,6 +149,7 @@ def translate_1_args_command(address, command, command_args, code):
             address += 1
     return address, code
 
+
 def translate_0_args_command(address, command, command_args, code):
     opcode = Opcode(command)
     assert opcode in [Opcode.HALT, Opcode.RET], "Only `halt` or `ret` instructions take no arguments"
@@ -166,6 +168,7 @@ def translate_0_args_command(address, command, command_args, code):
         )
         address += 5
     return address, code
+
 
 def translate_section_text_stage_1(section_text, address, code):
     labels = {}
@@ -222,6 +225,7 @@ def parse_line(line):
     name, value = map(str.strip, line.split(":", 1))
     return name, value
 
+
 def get_variable_type(value):
     if is_integer(value):
         return "integer"
@@ -230,6 +234,7 @@ def get_variable_type(value):
     if value.startswith("bf"):
         return "buffer"
     return "reference"
+
 
 def translate_section_data(section_data):
     variables = {

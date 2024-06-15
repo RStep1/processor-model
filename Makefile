@@ -16,15 +16,13 @@ ASM_CAT = $(ALGO_DIR)/cat.asm
 ASM_HELLO_USERNAME = $(ALGO_DIR)/hello_username.asm
 ASM_HELLO = $(ALGO_DIR)/hello.asm
 ASM_PROB2 = $(ALGO_DIR)/prob2.asm
-ASM_ALG = $(ALGO_DIR)/alg.asm
 
 JSON_CAT = $(CODE_DIR)/cat_code.json
 JSON_HELLO_USERNAME = $(CODE_DIR)/hello_username_code.json
 JSON_HELLO = $(CODE_DIR)/hello_code.json
 JSON_PROB2 = $(CODE_DIR)/prob2_code.json
-JSON_ALG = $(CODE_DIR)/alg_code.json
 
-# translate and run:
+# translate and run:`
 
 translate_all: translate_cat translate_hello_username translate_hello translate_prob2 translate_alg
 
@@ -42,9 +40,6 @@ translate_hello:
 translate_prob2:
 	$(TRANSLATOR) $(ASM_PROB2) $(JSON_PROB2)
 
-translate_alg:
-	$(TRANSLATOR) $(ASM_ALG) $(JSON_ALG)
-
 run_cat:
 	$(MACHINE) $(JSON_CAT) $(INPUT_CAT)
 
@@ -56,9 +51,6 @@ run_hello:
 
 run_prob2:
 	$(MACHINE) $(JSON_PROB2) $(INPUT_EMPTY)
-
-run_alg:
-	$(MACHINE) $(JSON_ALG) $(INPUT_EMPTY)
 
 clean:
 	rm -f $(JSON_FILES)

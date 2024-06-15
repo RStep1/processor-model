@@ -270,8 +270,6 @@ class ControlUnit:
         self.tick()
 
     def execute_input(self, _, args):
-        if len(self.data_path.input_buffer) == 0:
-            raise EOFError()
         symbol = self.data_path.input_buffer.pop(0)
         symbol_code = ord(symbol)
         self.memory[INPUT_PORT_ADDRESS]["args"][0] = symbol_code
@@ -407,8 +405,6 @@ def simulation(memory, input_tokens):
             control_unit.decode_and_execute_instruction()
             instr_counter += 1
             logging.debug("%s", control_unit)
-    except EOFError:
-        logging.warning("Input buffer is empty!")
     except StopIteration:
         pass
 

@@ -346,7 +346,7 @@ jmp .label   ; --> `jmp 123`, где 123 - номер инструкции по�
 
 ## ControlUnit
 
-![control unit](./schemes/)
+![control unit](./schemes/control_unit.png)
 
 Реализовано в классе `ControlUnit`.
 

@@ -1,0 +1,147 @@
+in_source: |
+  section .data:
+    greeting: "Hello World!"
+    ptr: greeting
+
+  section .text:
+      .start:
+          li r1, ptr  ; save address of first character in string
+          li r2, 0    ; for comparison
+      .loop:
+          ld r0, r1   ; get character by address in register
+          cmp r0, r2
+          jz .end     ; if it's 0-terminator, finish the program
+          output r0
+          inc r1
+          jmp .loop
+      .end:
+          halt
+
+in_stdin: |-
+  This text will be printed!
+  Unbelievably!
+out_code: |-
+  [{"index": 0, "name": "jmp", "args": [null, null, null, "17"]},
+   {"index": 1, "name": "input_port", "args": [0]},
+   {"index": 2, "name": "output_port", "args": [0]},
+   {"index": 3, "name": "greeting", "args": [72]},
+   {"index": 4, "name": "greeting", "args": [101]},
+   {"index": 5, "name": "greeting", "args": [108]},
+   {"index": 6, "name": "greeting", "args": [108]},
+   {"index": 7, "name": "greeting", "args": [111]},
+   {"index": 8, "name": "greeting", "args": [32]},
+   {"index": 9, "name": "greeting", "args": [87]},
+   {"index": 10, "name": "greeting", "args": [111]},
+   {"index": 11, "name": "greeting", "args": [114]},
+   {"index": 12, "name": "greeting", "args": [108]},
+   {"index": 13, "name": "greeting", "args": [100]},
+   {"index": 14, "name": "greeting", "args": [33]},
+   {"index": 15, "name": "greeting", "args": [0]},
+   {"index": 16, "name": "ptr", "args": [3]},
+   {"index": 17, "name": "li", "args": ["r1", null, null, "3"]},
+   {"index": 18, "name": "li", "args": ["r2", null, null, "0"]},
+   {"index": 19, "name": "ld", "args": ["r0", null, null, "r1"]},
+   {"index": 20, "name": "cmp", "args": ["r0", "r2", null, null]},
+   {"index": 21, "name": "jz", "args": [null, null, null, "25"]},
+   {"index": 22, "name": "output", "args": ["r0", null, null, null]},
+   {"index": 23, "name": "inc", "args": ["r1", null, null, null]},
+   {"index": 24, "name": "jmp", "args": [null, null, null, "19"]},
+   {"index": 25, "name": "halt", "args": [null, null, null, null]}]
+out_stdout: |
+  source LoC: 16 code instr: 10
+  ============================================================
+  Hello World!
+  instr_counter: 78 ticks: 246
+out_log: |
+  DEBUG   machine:simulation    TICK:    0 IP:   0 AR:    0 SP: 2047 RR   0 GPR: [0, 0, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: None 	jmp    17
+  DEBUG   machine:simulation    TICK:    2 IP:  17 AR:    0 SP: 2047 RR   0 GPR: [0, 0, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: None 	li     r1 3
+  DEBUG   machine:simulation    TICK:    5 IP:  18 AR:    0 SP: 2047 RR   0 GPR: [0, 3, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: None 	li     r2 0
+  DEBUG   machine:simulation    TICK:    8 IP:  19 AR:    0 SP: 2047 RR   0 GPR: [0, 3, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: None 	ld     r0 r1
+  DEBUG   machine:simulation    TICK:   12 IP:  20 AR:    3 SP: 2047 RR   0 GPR: [72, 3, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 72 	cmp    r0 r2
+  DEBUG   machine:simulation    TICK:   15 IP:  21 AR:    3 SP: 2047 RR   0 GPR: [72, 3, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 72 	jz     25
+  DEBUG   machine:simulation    TICK:   17 IP:  22 AR:    3 SP: 2047 RR   0 GPR: [72, 3, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 72 	output r0
+  DEBUG   machine:execute_output output: 'H' << 'H'
+  DEBUG   machine:simulation    TICK:   21 IP:  23 AR:    2 SP: 2047 RR   0 GPR: [72, 3, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 72 	inc    r1
+  DEBUG   machine:simulation    TICK:   25 IP:  24 AR:    2 SP: 2047 RR   0 GPR: [72, 4, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 72 	jmp    19
+  DEBUG   machine:simulation    TICK:   27 IP:  19 AR:    2 SP: 2047 RR   0 GPR: [72, 4, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 72 	ld     r0 r1
+  DEBUG   machine:simulation    TICK:   31 IP:  20 AR:    4 SP: 2047 RR   0 GPR: [101, 4, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 101 	cmp    r0 r2
+  DEBUG   machine:simulation    TICK:   34 IP:  21 AR:    4 SP: 2047 RR   0 GPR: [101, 4, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 101 	jz     25
+  DEBUG   machine:simulation    TICK:   36 IP:  22 AR:    4 SP: 2047 RR   0 GPR: [101, 4, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 101 	output r0
+  DEBUG   machine:execute_output output: 'He' << 'e'
+  DEBUG   machine:simulation    TICK:   40 IP:  23 AR:    2 SP: 2047 RR   0 GPR: [101, 4, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 101 	inc    r1
+  DEBUG   machine:simulation    TICK:   44 IP:  24 AR:    2 SP: 2047 RR   0 GPR: [101, 5, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 101 	jmp    19
+  DEBUG   machine:simulation    TICK:   46 IP:  19 AR:    2 SP: 2047 RR   0 GPR: [101, 5, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 101 	ld     r0 r1
+  DEBUG   machine:simulation    TICK:   50 IP:  20 AR:    5 SP: 2047 RR   0 GPR: [108, 5, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	cmp    r0 r2
+  DEBUG   machine:simulation    TICK:   53 IP:  21 AR:    5 SP: 2047 RR   0 GPR: [108, 5, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	jz     25
+  DEBUG   machine:simulation    TICK:   55 IP:  22 AR:    5 SP: 2047 RR   0 GPR: [108, 5, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	output r0
+  DEBUG   machine:execute_output output: 'Hel' << 'l'
+  DEBUG   machine:simulation    TICK:   59 IP:  23 AR:    2 SP: 2047 RR   0 GPR: [108, 5, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	inc    r1
+  DEBUG   machine:simulation    TICK:   63 IP:  24 AR:    2 SP: 2047 RR   0 GPR: [108, 6, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	jmp    19
+  DEBUG   machine:simulation    TICK:   65 IP:  19 AR:    2 SP: 2047 RR   0 GPR: [108, 6, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	ld     r0 r1
+  DEBUG   machine:simulation    TICK:   69 IP:  20 AR:    6 SP: 2047 RR   0 GPR: [108, 6, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	cmp    r0 r2
+  DEBUG   machine:simulation    TICK:   72 IP:  21 AR:    6 SP: 2047 RR   0 GPR: [108, 6, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	jz     25
+  DEBUG   machine:simulation    TICK:   74 IP:  22 AR:    6 SP: 2047 RR   0 GPR: [108, 6, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	output r0
+  DEBUG   machine:execute_output output: 'Hell' << 'l'
+  DEBUG   machine:simulation    TICK:   78 IP:  23 AR:    2 SP: 2047 RR   0 GPR: [108, 6, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	inc    r1
+  DEBUG   machine:simulation    TICK:   82 IP:  24 AR:    2 SP: 2047 RR   0 GPR: [108, 7, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	jmp    19
+  DEBUG   machine:simulation    TICK:   84 IP:  19 AR:    2 SP: 2047 RR   0 GPR: [108, 7, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	ld     r0 r1
+  DEBUG   machine:simulation    TICK:   88 IP:  20 AR:    7 SP: 2047 RR   0 GPR: [111, 7, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 111 	cmp    r0 r2
+  DEBUG   machine:simulation    TICK:   91 IP:  21 AR:    7 SP: 2047 RR   0 GPR: [111, 7, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 111 	jz     25
+  DEBUG   machine:simulation    TICK:   93 IP:  22 AR:    7 SP: 2047 RR   0 GPR: [111, 7, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 111 	output r0
+  DEBUG   machine:execute_output output: 'Hello' << 'o'
+  DEBUG   machine:simulation    TICK:   97 IP:  23 AR:    2 SP: 2047 RR   0 GPR: [111, 7, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 111 	inc    r1
+  DEBUG   machine:simulation    TICK:  101 IP:  24 AR:    2 SP: 2047 RR   0 GPR: [111, 8, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 111 	jmp    19
+  DEBUG   machine:simulation    TICK:  103 IP:  19 AR:    2 SP: 2047 RR   0 GPR: [111, 8, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 111 	ld     r0 r1
+  DEBUG   machine:simulation    TICK:  107 IP:  20 AR:    8 SP: 2047 RR   0 GPR: [32, 8, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 32 	cmp    r0 r2
+  DEBUG   machine:simulation    TICK:  110 IP:  21 AR:    8 SP: 2047 RR   0 GPR: [32, 8, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 32 	jz     25
+  DEBUG   machine:simulation    TICK:  112 IP:  22 AR:    8 SP: 2047 RR   0 GPR: [32, 8, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 32 	output r0
+  DEBUG   machine:execute_output output: 'Hello ' << ' '
+  DEBUG   machine:simulation    TICK:  116 IP:  23 AR:    2 SP: 2047 RR   0 GPR: [32, 8, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 32 	inc    r1
+  DEBUG   machine:simulation    TICK:  120 IP:  24 AR:    2 SP: 2047 RR   0 GPR: [32, 9, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 32 	jmp    19
+  DEBUG   machine:simulation    TICK:  122 IP:  19 AR:    2 SP: 2047 RR   0 GPR: [32, 9, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 32 	ld     r0 r1
+  DEBUG   machine:simulation    TICK:  126 IP:  20 AR:    9 SP: 2047 RR   0 GPR: [87, 9, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 87 	cmp    r0 r2
+  DEBUG   machine:simulation    TICK:  129 IP:  21 AR:    9 SP: 2047 RR   0 GPR: [87, 9, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 87 	jz     25
+  DEBUG   machine:simulation    TICK:  131 IP:  22 AR:    9 SP: 2047 RR   0 GPR: [87, 9, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 87 	output r0
+  DEBUG   machine:execute_output output: 'Hello W' << 'W'
+  DEBUG   machine:simulation    TICK:  135 IP:  23 AR:    2 SP: 2047 RR   0 GPR: [87, 9, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 87 	inc    r1
+  DEBUG   machine:simulation    TICK:  139 IP:  24 AR:    2 SP: 2047 RR   0 GPR: [87, 10, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 87 	jmp    19
+  DEBUG   machine:simulation    TICK:  141 IP:  19 AR:    2 SP: 2047 RR   0 GPR: [87, 10, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 87 	ld     r0 r1
+  DEBUG   machine:simulation    TICK:  145 IP:  20 AR:   10 SP: 2047 RR   0 GPR: [111, 10, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 111 	cmp    r0 r2
+  DEBUG   machine:simulation    TICK:  148 IP:  21 AR:   10 SP: 2047 RR   0 GPR: [111, 10, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 111 	jz     25
+  DEBUG   machine:simulation    TICK:  150 IP:  22 AR:   10 SP: 2047 RR   0 GPR: [111, 10, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 111 	output r0
+  DEBUG   machine:execute_output output: 'Hello Wo' << 'o'
+  DEBUG   machine:simulation    TICK:  154 IP:  23 AR:    2 SP: 2047 RR   0 GPR: [111, 10, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 111 	inc    r1
+  DEBUG   machine:simulation    TICK:  158 IP:  24 AR:    2 SP: 2047 RR   0 GPR: [111, 11, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 111 	jmp    19
+  DEBUG   machine:simulation    TICK:  160 IP:  19 AR:    2 SP: 2047 RR   0 GPR: [111, 11, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 111 	ld     r0 r1
+  DEBUG   machine:simulation    TICK:  164 IP:  20 AR:   11 SP: 2047 RR   0 GPR: [114, 11, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 114 	cmp    r0 r2
+  DEBUG   machine:simulation    TICK:  167 IP:  21 AR:   11 SP: 2047 RR   0 GPR: [114, 11, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 114 	jz     25
+  DEBUG   machine:simulation    TICK:  169 IP:  22 AR:   11 SP: 2047 RR   0 GPR: [114, 11, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 114 	output r0
+  DEBUG   machine:execute_output output: 'Hello Wor' << 'r'
+  DEBUG   machine:simulation    TICK:  173 IP:  23 AR:    2 SP: 2047 RR   0 GPR: [114, 11, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 114 	inc    r1
+  DEBUG   machine:simulation    TICK:  177 IP:  24 AR:    2 SP: 2047 RR   0 GPR: [114, 12, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 114 	jmp    19
+  DEBUG   machine:simulation    TICK:  179 IP:  19 AR:    2 SP: 2047 RR   0 GPR: [114, 12, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 114 	ld     r0 r1
+  DEBUG   machine:simulation    TICK:  183 IP:  20 AR:   12 SP: 2047 RR   0 GPR: [108, 12, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	cmp    r0 r2
+  DEBUG   machine:simulation    TICK:  186 IP:  21 AR:   12 SP: 2047 RR   0 GPR: [108, 12, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	jz     25
+  DEBUG   machine:simulation    TICK:  188 IP:  22 AR:   12 SP: 2047 RR   0 GPR: [108, 12, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	output r0
+  DEBUG   machine:execute_output output: 'Hello Worl' << 'l'
+  DEBUG   machine:simulation    TICK:  192 IP:  23 AR:    2 SP: 2047 RR   0 GPR: [108, 12, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	inc    r1
+  DEBUG   machine:simulation    TICK:  196 IP:  24 AR:    2 SP: 2047 RR   0 GPR: [108, 13, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	jmp    19
+  DEBUG   machine:simulation    TICK:  198 IP:  19 AR:    2 SP: 2047 RR   0 GPR: [108, 13, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 108 	ld     r0 r1
+  DEBUG   machine:simulation    TICK:  202 IP:  20 AR:   13 SP: 2047 RR   0 GPR: [100, 13, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 100 	cmp    r0 r2
+  DEBUG   machine:simulation    TICK:  205 IP:  21 AR:   13 SP: 2047 RR   0 GPR: [100, 13, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 100 	jz     25
+  DEBUG   machine:simulation    TICK:  207 IP:  22 AR:   13 SP: 2047 RR   0 GPR: [100, 13, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 100 	output r0
+  DEBUG   machine:execute_output output: 'Hello World' << 'd'
+  DEBUG   machine:simulation    TICK:  211 IP:  23 AR:    2 SP: 2047 RR   0 GPR: [100, 13, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 100 	inc    r1
+  DEBUG   machine:simulation    TICK:  215 IP:  24 AR:    2 SP: 2047 RR   0 GPR: [100, 14, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 100 	jmp    19
+  DEBUG   machine:simulation    TICK:  217 IP:  19 AR:    2 SP: 2047 RR   0 GPR: [100, 14, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 100 	ld     r0 r1
+  DEBUG   machine:simulation    TICK:  221 IP:  20 AR:   14 SP: 2047 RR   0 GPR: [33, 14, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 33 	cmp    r0 r2
+  DEBUG   machine:simulation    TICK:  224 IP:  21 AR:   14 SP: 2047 RR   0 GPR: [33, 14, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 33 	jz     25
+  DEBUG   machine:simulation    TICK:  226 IP:  22 AR:   14 SP: 2047 RR   0 GPR: [33, 14, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 33 	output r0
+  DEBUG   machine:execute_output output: 'Hello World!' << '!'
+  DEBUG   machine:simulation    TICK:  230 IP:  23 AR:    2 SP: 2047 RR   0 GPR: [33, 14, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 33 	inc    r1
+  DEBUG   machine:simulation    TICK:  234 IP:  24 AR:    2 SP: 2047 RR   0 GPR: [33, 15, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 33 	jmp    19
+  DEBUG   machine:simulation    TICK:  236 IP:  19 AR:    2 SP: 2047 RR   0 GPR: [33, 15, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 33 	ld     r0 r1
+  DEBUG   machine:simulation    TICK:  240 IP:  20 AR:   15 SP: 2047 RR   0 GPR: [0, 15, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 0 	cmp    r0 r2
+  DEBUG   machine:simulation    TICK:  243 IP:  21 AR:   15 SP: 2047 RR   0 GPR: [0, 15, 0, 0, 0, 0, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 0 	jz     25
+  DEBUG   machine:simulation    TICK:  245 IP:  25 AR:   15 SP: 2047 RR   0 GPR: [0, 15, 0, 0, 0, 0, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 0 	halt  
+  INFO    machine:simulation    output_buffer: 'Hello World!'

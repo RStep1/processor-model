@@ -25,7 +25,7 @@ section .text:
 
     .input_username:
         li r1, username_ptr
-        li r2, 0            ; for comparation with 0-terminator
+        li r2, 0            ; for comparison with 0-terminator
         .loop2:
             input r0
             cmp r0, r2
@@ -37,7 +37,7 @@ section .text:
             ret
 
     .print_string:          ; r1 - pointer on str
-        li r2, 0            ; for comparation with 0-terminator
+        li r2, 0            ; for comparison with 0-terminator
         .loop:
             ld r0, r1
             cmp r0, r2

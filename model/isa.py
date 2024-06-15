@@ -44,9 +44,12 @@ def read_code(filename):
 
     return code
 
-def write_code(filename: str, code: str):
-    with open(filename, mode="bw") as f:
-        f.write(code.encode("utf-8"))
+def write_code(filename, code):
+    with open(filename, "w", encoding="utf-8") as f:
+        buf = []
+        for instr in code:
+            buf.append(json.dumps(instr))
+        f.write("[" + ",\n ".join(buf) + "]")
 
 class Variable:
     def __init__(self, name, address, data):

@@ -1,0 +1,892 @@
+in_source: |
+  section .data:
+      LIMIT_VALUE: 4000000
+      DIVIDER: 2
+  section .text:
+      .start:
+          li r4, 0            ; sum of even-valued terms
+
+          li r0, 1            ; first fib value
+          mov r1, r0          ; save to r1 for function
+          call .sum_if_even
+          li r1, 2            ; second fib value
+                              ; r3 - even or odd
+          call .sum_if_even
+
+      .loop:
+          add r2, r1, r0
+          mov r0, r1
+          mov r1, r2
+          
+          li r5, LIMIT_VALUE
+          cmp r5, r1
+          jn .end             ; if term > 4000000 go to halt
+          call .sum_if_even
+          jmp .loop
+      
+      .end:
+          ; output r4 ; set output cell, expected answer = 4613732
+          call .print_int
+          halt
+
+      .sum_if_even:
+          li r5, DIVIDER
+          mod r3, r1, r5      ; check if r3 % 2
+          li r6, 0
+          cmp r3, r6          ; r3 == 0 ?
+          jnz .quit           ; if no - skip operation
+          add r4, r4, r1      ; if yes - update sum
+      .quit:
+          ret
+
+      .print_int:             ; print sequetially each symbol in number
+                              ; 4613732 -> 4 6 1 3 7 3 2
+          li r0, 1            ; number for separation, each iteration it will be devided by 10
+          li r2, 10           ; divider and multiplier for r0 number
+                              ; r4 - result
+
+          .sep_loop:          ; build r0 number, it should have same amout of digits as in the result 
+              mul r0, r0, r2  ; r0 *= 10
+              cmp r4, r0      ; r4 - r0 = ?
+              jnn .sep_loop   ; if r4 - r0 >= 0: continue looping
+          div r0, r0, r2      ; r0 correction
+
+          li r1, 48           ; for translation in ASCII
+                              ; r3 - use for symbol code, will be printed
+
+          .loop1:
+              div r3, r4, r0 ; r3 = r4 / r0 -> get left digit of number
+              add r3, r3, r1 ; r4 += 48 -> to ASCII code
+              mod r4, r4, r0 ; r4 %= r0 -> remove first digit
+              div r0, r0, r2 ; r0 /= 10
+              output r3
+              li r5, 0       ; for comparison r0
+              cmp r0, r5
+              jz .quit_print_int  ; if r0 == 0: end cycle and function
+              jmp .loop1
+          .quit_print_int:
+              ret
+
+in_stdin: |-
+  This text will be printed!
+  Unbelievably!
+out_code: |-
+  [{"index": 0, "name": "jmp", "args": [null, null, null, "5"]},
+   {"index": 1, "name": "input_port", "args": [0]},
+   {"index": 2, "name": "output_port", "args": [0]},
+   {"index": 3, "name": "LIMIT_VALUE", "args": [4000000]},
+   {"index": 4, "name": "DIVIDER", "args": [2]},
+   {"index": 5, "name": "li", "args": ["r4", null, null, "0"]},
+   {"index": 6, "name": "li", "args": ["r0", null, null, "1"]},
+   {"index": 7, "name": "mov", "args": ["r1", "r0", null, null]},
+   {"index": 8, "name": "dec", "args": ["sp", null, null, null]},
+   {"index": 9, "name": "store", "args": ["ip", null, null, "sp"]},
+   {"index": 10, "name": "jmp", "args": [null, null, null, "29"]},
+   {"index": 11, "name": "li", "args": ["r1", null, null, "2"]},
+   {"index": 12, "name": "dec", "args": ["sp", null, null, null]},
+   {"index": 13, "name": "store", "args": ["ip", null, null, "sp"]},
+   {"index": 14, "name": "jmp", "args": [null, null, null, "29"]},
+   {"index": 15, "name": "add", "args": ["r2", "r1", "r0", null]},
+   {"index": 16, "name": "mov", "args": ["r0", "r1", null, null]},
+   {"index": 17, "name": "mov", "args": ["r1", "r2", null, null]},
+   {"index": 18, "name": "li", "args": ["r5", null, null, "4000000"]},
+   {"index": 19, "name": "cmp", "args": ["r5", "r1", null, null]},
+   {"index": 20, "name": "jn", "args": [null, null, null, "25"]},
+   {"index": 21, "name": "dec", "args": ["sp", null, null, null]},
+   {"index": 22, "name": "store", "args": ["ip", null, null, "sp"]},
+   {"index": 23, "name": "jmp", "args": [null, null, null, "29"]},
+   {"index": 24, "name": "jmp", "args": [null, null, null, "15"]},
+   {"index": 25, "name": "dec", "args": ["sp", null, null, null]},
+   {"index": 26, "name": "store", "args": ["ip", null, null, "sp"]},
+   {"index": 27, "name": "jmp", "args": [null, null, null, "40"]},
+   {"index": 28, "name": "halt", "args": [null, null, null, null]},
+   {"index": 29, "name": "li", "args": ["r5", null, null, "2"]},
+   {"index": 30, "name": "mod", "args": ["r3", "r1", "r5", null]},
+   {"index": 31, "name": "li", "args": ["r6", null, null, "0"]},
+   {"index": 32, "name": "cmp", "args": ["r3", "r6", null, null]},
+   {"index": 33, "name": "jnz", "args": [null, null, null, "35"]},
+   {"index": 34, "name": "add", "args": ["r4", "r4", "r1", null]},
+   {"index": 35, "name": "ld", "args": ["rr", null, null, "sp"]},
+   {"index": 36, "name": "inc", "args": ["sp", null, null, null]},
+   {"index": 37, "name": "inc", "args": ["rr", null, null, null]},
+   {"index": 38, "name": "inc", "args": ["rr", null, null, null]},
+   {"index": 39, "name": "jmp", "args": [null, null, null, "rr"]},
+   {"index": 40, "name": "li", "args": ["r0", null, null, "1"]},
+   {"index": 41, "name": "li", "args": ["r2", null, null, "10"]},
+   {"index": 42, "name": "mul", "args": ["r0", "r0", "r2", null]},
+   {"index": 43, "name": "cmp", "args": ["r4", "r0", null, null]},
+   {"index": 44, "name": "jnn", "args": [null, null, null, "42"]},
+   {"index": 45, "name": "div", "args": ["r0", "r0", "r2", null]},
+   {"index": 46, "name": "li", "args": ["r1", null, null, "48"]},
+   {"index": 47, "name": "div", "args": ["r3", "r4", "r0", null]},
+   {"index": 48, "name": "add", "args": ["r3", "r3", "r1", null]},
+   {"index": 49, "name": "mod", "args": ["r4", "r4", "r0", null]},
+   {"index": 50, "name": "div", "args": ["r0", "r0", "r2", null]},
+   {"index": 51, "name": "output", "args": ["r3", null, null, null]},
+   {"index": 52, "name": "li", "args": ["r5", null, null, "0"]},
+   {"index": 53, "name": "cmp", "args": ["r0", "r5", null, null]},
+   {"index": 54, "name": "jz", "args": [null, null, null, "56"]},
+   {"index": 55, "name": "jmp", "args": [null, null, null, "47"]},
+   {"index": 56, "name": "ld", "args": ["rr", null, null, "sp"]},
+   {"index": 57, "name": "inc", "args": ["sp", null, null, null]},
+   {"index": 58, "name": "inc", "args": ["rr", null, null, null]},
+   {"index": 59, "name": "inc", "args": ["rr", null, null, null]},
+   {"index": 60, "name": "jmp", "args": [null, null, null, "rr"]}]
+out_stdout: |
+  source LoC: 53 code instr: 57
+  ============================================================
+  4613732
+  instr_counter: 743 ticks: 2461
+out_log: |
+  DEBUG   machine:simulation    TICK:    0 IP:   0 AR:    0 SP: 2047 RR   0 GPR: [0, 0, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: None 	jmp    5
+  DEBUG   machine:simulation    TICK:    2 IP:   5 AR:    0 SP: 2047 RR   0 GPR: [0, 0, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: None 	li     r4 0
+  DEBUG   machine:simulation    TICK:    5 IP:   6 AR:    0 SP: 2047 RR   0 GPR: [0, 0, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: None 	li     r0 1
+  DEBUG   machine:simulation    TICK:    8 IP:   7 AR:    0 SP: 2047 RR   0 GPR: [1, 0, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: None 	mov    r1 r0
+  DEBUG   machine:simulation    TICK:   12 IP:   8 AR:    0 SP: 2047 RR   0 GPR: [1, 1, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: None 	dec    sp
+  DEBUG   machine:simulation    TICK:   16 IP:   9 AR:    0 SP: 2046 RR   0 GPR: [1, 1, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: None 	store  ip sp
+  DEBUG   machine:simulation    TICK:   20 IP:  10 AR: 2046 SP: 2046 RR   0 GPR: [1, 1, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 9 	jmp    29
+  DEBUG   machine:simulation    TICK:   22 IP:  29 AR: 2046 SP: 2046 RR   0 GPR: [1, 1, 0, 0, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 9 	li     r5 2
+  DEBUG   machine:simulation    TICK:   25 IP:  30 AR: 2046 SP: 2046 RR   0 GPR: [1, 1, 0, 0, 0, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 9 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK:   29 IP:  31 AR: 2046 SP: 2046 RR   0 GPR: [1, 1, 0, 1, 0, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 9 	li     r6 0
+  DEBUG   machine:simulation    TICK:   32 IP:  32 AR: 2046 SP: 2046 RR   0 GPR: [1, 1, 0, 1, 0, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 9 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK:   35 IP:  33 AR: 2046 SP: 2046 RR   0 GPR: [1, 1, 0, 1, 0, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 9 	jnz    35
+  DEBUG   machine:simulation    TICK:   37 IP:  35 AR: 2046 SP: 2046 RR   0 GPR: [1, 1, 0, 1, 0, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 9 	ld     rr sp
+  DEBUG   machine:simulation    TICK:   41 IP:  36 AR: 2046 SP: 2046 RR   9 GPR: [1, 1, 0, 1, 0, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 9 	inc    sp
+  DEBUG   machine:simulation    TICK:   45 IP:  37 AR: 2046 SP: 2047 RR   9 GPR: [1, 1, 0, 1, 0, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 9 	inc    rr
+  DEBUG   machine:simulation    TICK:   49 IP:  38 AR: 2046 SP: 2047 RR  10 GPR: [1, 1, 0, 1, 0, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 9 	inc    rr
+  DEBUG   machine:simulation    TICK:   53 IP:  39 AR: 2046 SP: 2047 RR  11 GPR: [1, 1, 0, 1, 0, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 9 	jmp    rr
+  DEBUG   machine:simulation    TICK:   56 IP:  11 AR: 2046 SP: 2047 RR  11 GPR: [1, 1, 0, 1, 0, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 9 	li     r1 2
+  DEBUG   machine:simulation    TICK:   59 IP:  12 AR: 2046 SP: 2047 RR  11 GPR: [1, 2, 0, 1, 0, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 9 	dec    sp
+  DEBUG   machine:simulation    TICK:   63 IP:  13 AR: 2046 SP: 2046 RR  11 GPR: [1, 2, 0, 1, 0, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 9 	store  ip sp
+  DEBUG   machine:simulation    TICK:   67 IP:  14 AR: 2046 SP: 2046 RR  11 GPR: [1, 2, 0, 1, 0, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 13 	jmp    29
+  DEBUG   machine:simulation    TICK:   69 IP:  29 AR: 2046 SP: 2046 RR  11 GPR: [1, 2, 0, 1, 0, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 13 	li     r5 2
+  DEBUG   machine:simulation    TICK:   72 IP:  30 AR: 2046 SP: 2046 RR  11 GPR: [1, 2, 0, 1, 0, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 13 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK:   76 IP:  31 AR: 2046 SP: 2046 RR  11 GPR: [1, 2, 0, 0, 0, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 13 	li     r6 0
+  DEBUG   machine:simulation    TICK:   79 IP:  32 AR: 2046 SP: 2046 RR  11 GPR: [1, 2, 0, 0, 0, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 13 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK:   82 IP:  33 AR: 2046 SP: 2046 RR  11 GPR: [1, 2, 0, 0, 0, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 13 	jnz    35
+  DEBUG   machine:simulation    TICK:   84 IP:  34 AR: 2046 SP: 2046 RR  11 GPR: [1, 2, 0, 0, 0, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 13 	add    r4 r4 r1
+  DEBUG   machine:simulation    TICK:   88 IP:  35 AR: 2046 SP: 2046 RR  11 GPR: [1, 2, 0, 0, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 13 	ld     rr sp
+  DEBUG   machine:simulation    TICK:   92 IP:  36 AR: 2046 SP: 2046 RR  13 GPR: [1, 2, 0, 0, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 13 	inc    sp
+  DEBUG   machine:simulation    TICK:   96 IP:  37 AR: 2046 SP: 2047 RR  13 GPR: [1, 2, 0, 0, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 13 	inc    rr
+  DEBUG   machine:simulation    TICK:  100 IP:  38 AR: 2046 SP: 2047 RR  14 GPR: [1, 2, 0, 0, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 13 	inc    rr
+  DEBUG   machine:simulation    TICK:  104 IP:  39 AR: 2046 SP: 2047 RR  15 GPR: [1, 2, 0, 0, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 13 	jmp    rr
+  DEBUG   machine:simulation    TICK:  107 IP:  15 AR: 2046 SP: 2047 RR  15 GPR: [1, 2, 0, 0, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 13 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK:  111 IP:  16 AR: 2046 SP: 2047 RR  15 GPR: [1, 2, 3, 0, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 13 	mov    r0 r1
+  DEBUG   machine:simulation    TICK:  115 IP:  17 AR: 2046 SP: 2047 RR  15 GPR: [2, 2, 3, 0, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 13 	mov    r1 r2
+  DEBUG   machine:simulation    TICK:  119 IP:  18 AR: 2046 SP: 2047 RR  15 GPR: [2, 3, 3, 0, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 13 	li     r5 4000000
+  DEBUG   machine:simulation    TICK:  122 IP:  19 AR: 2046 SP: 2047 RR  15 GPR: [2, 3, 3, 0, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 13 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK:  125 IP:  20 AR: 2046 SP: 2047 RR  15 GPR: [2, 3, 3, 0, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 13 	jn     25
+  DEBUG   machine:simulation    TICK:  127 IP:  21 AR: 2046 SP: 2047 RR  15 GPR: [2, 3, 3, 0, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 13 	dec    sp
+  DEBUG   machine:simulation    TICK:  131 IP:  22 AR: 2046 SP: 2046 RR  15 GPR: [2, 3, 3, 0, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 13 	store  ip sp
+  DEBUG   machine:simulation    TICK:  135 IP:  23 AR: 2046 SP: 2046 RR  15 GPR: [2, 3, 3, 0, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK:  137 IP:  29 AR: 2046 SP: 2046 RR  15 GPR: [2, 3, 3, 0, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK:  140 IP:  30 AR: 2046 SP: 2046 RR  15 GPR: [2, 3, 3, 0, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK:  144 IP:  31 AR: 2046 SP: 2046 RR  15 GPR: [2, 3, 3, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK:  147 IP:  32 AR: 2046 SP: 2046 RR  15 GPR: [2, 3, 3, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK:  150 IP:  33 AR: 2046 SP: 2046 RR  15 GPR: [2, 3, 3, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK:  152 IP:  35 AR: 2046 SP: 2046 RR  15 GPR: [2, 3, 3, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK:  156 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [2, 3, 3, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK:  160 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [2, 3, 3, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  164 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [2, 3, 3, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  168 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [2, 3, 3, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK:  171 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [2, 3, 3, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK:  173 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [2, 3, 3, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK:  177 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [2, 3, 5, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK:  181 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [3, 3, 5, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK:  185 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [3, 5, 5, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK:  188 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [3, 5, 5, 1, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK:  191 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [3, 5, 5, 1, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK:  193 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [3, 5, 5, 1, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK:  197 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [3, 5, 5, 1, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK:  201 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [3, 5, 5, 1, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK:  203 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [3, 5, 5, 1, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK:  206 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [3, 5, 5, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK:  210 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [3, 5, 5, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK:  213 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [3, 5, 5, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK:  216 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [3, 5, 5, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK:  218 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [3, 5, 5, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK:  222 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [3, 5, 5, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK:  226 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [3, 5, 5, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  230 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [3, 5, 5, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  234 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [3, 5, 5, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK:  237 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [3, 5, 5, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK:  239 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [3, 5, 5, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK:  243 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [3, 5, 8, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK:  247 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [5, 5, 8, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK:  251 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [5, 8, 8, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK:  254 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [5, 8, 8, 1, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK:  257 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [5, 8, 8, 1, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK:  259 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [5, 8, 8, 1, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK:  263 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [5, 8, 8, 1, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK:  267 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [5, 8, 8, 1, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK:  269 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [5, 8, 8, 1, 2, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK:  272 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [5, 8, 8, 1, 2, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK:  276 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [5, 8, 8, 0, 2, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK:  279 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [5, 8, 8, 0, 2, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK:  282 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [5, 8, 8, 0, 2, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK:  284 IP:  34 AR: 2046 SP: 2046 RR  24 GPR: [5, 8, 8, 0, 2, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	add    r4 r4 r1
+  DEBUG   machine:simulation    TICK:  288 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [5, 8, 8, 0, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK:  292 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [5, 8, 8, 0, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK:  296 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [5, 8, 8, 0, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  300 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [5, 8, 8, 0, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  304 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [5, 8, 8, 0, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK:  307 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [5, 8, 8, 0, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK:  309 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [5, 8, 8, 0, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK:  313 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [5, 8, 13, 0, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK:  317 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [8, 8, 13, 0, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK:  321 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [8, 13, 13, 0, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK:  324 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [8, 13, 13, 0, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK:  327 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [8, 13, 13, 0, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK:  329 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [8, 13, 13, 0, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK:  333 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [8, 13, 13, 0, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK:  337 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [8, 13, 13, 0, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK:  339 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [8, 13, 13, 0, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK:  342 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [8, 13, 13, 0, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK:  346 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [8, 13, 13, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK:  349 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [8, 13, 13, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK:  352 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [8, 13, 13, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK:  354 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [8, 13, 13, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK:  358 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [8, 13, 13, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK:  362 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [8, 13, 13, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  366 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [8, 13, 13, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  370 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [8, 13, 13, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK:  373 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [8, 13, 13, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK:  375 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [8, 13, 13, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK:  379 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [8, 13, 21, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK:  383 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [13, 13, 21, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK:  387 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [13, 21, 21, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK:  390 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [13, 21, 21, 1, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK:  393 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [13, 21, 21, 1, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK:  395 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [13, 21, 21, 1, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK:  399 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [13, 21, 21, 1, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK:  403 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [13, 21, 21, 1, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK:  405 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [13, 21, 21, 1, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK:  408 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [13, 21, 21, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK:  412 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [13, 21, 21, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK:  415 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [13, 21, 21, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK:  418 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [13, 21, 21, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK:  420 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [13, 21, 21, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK:  424 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [13, 21, 21, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK:  428 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [13, 21, 21, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  432 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [13, 21, 21, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  436 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [13, 21, 21, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK:  439 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [13, 21, 21, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK:  441 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [13, 21, 21, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK:  445 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [13, 21, 34, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK:  449 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [21, 21, 34, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK:  453 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [21, 34, 34, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK:  456 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [21, 34, 34, 1, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK:  459 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [21, 34, 34, 1, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK:  461 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [21, 34, 34, 1, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK:  465 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [21, 34, 34, 1, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK:  469 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [21, 34, 34, 1, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK:  471 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [21, 34, 34, 1, 10, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK:  474 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [21, 34, 34, 1, 10, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK:  478 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [21, 34, 34, 0, 10, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK:  481 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [21, 34, 34, 0, 10, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK:  484 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [21, 34, 34, 0, 10, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK:  486 IP:  34 AR: 2046 SP: 2046 RR  24 GPR: [21, 34, 34, 0, 10, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	add    r4 r4 r1
+  DEBUG   machine:simulation    TICK:  490 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [21, 34, 34, 0, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK:  494 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [21, 34, 34, 0, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK:  498 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [21, 34, 34, 0, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  502 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [21, 34, 34, 0, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  506 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [21, 34, 34, 0, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK:  509 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [21, 34, 34, 0, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK:  511 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [21, 34, 34, 0, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK:  515 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [21, 34, 55, 0, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK:  519 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [34, 34, 55, 0, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK:  523 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [34, 55, 55, 0, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK:  526 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [34, 55, 55, 0, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK:  529 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [34, 55, 55, 0, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK:  531 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [34, 55, 55, 0, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK:  535 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [34, 55, 55, 0, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK:  539 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [34, 55, 55, 0, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK:  541 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [34, 55, 55, 0, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK:  544 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [34, 55, 55, 0, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK:  548 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [34, 55, 55, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK:  551 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [34, 55, 55, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK:  554 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [34, 55, 55, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK:  556 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [34, 55, 55, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK:  560 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [34, 55, 55, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK:  564 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [34, 55, 55, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  568 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [34, 55, 55, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  572 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [34, 55, 55, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK:  575 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [34, 55, 55, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK:  577 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [34, 55, 55, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK:  581 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [34, 55, 89, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK:  585 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [55, 55, 89, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK:  589 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [55, 89, 89, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK:  592 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [55, 89, 89, 1, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK:  595 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [55, 89, 89, 1, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK:  597 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [55, 89, 89, 1, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK:  601 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [55, 89, 89, 1, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK:  605 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [55, 89, 89, 1, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK:  607 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [55, 89, 89, 1, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK:  610 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [55, 89, 89, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK:  614 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [55, 89, 89, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK:  617 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [55, 89, 89, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK:  620 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [55, 89, 89, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK:  622 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [55, 89, 89, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK:  626 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [55, 89, 89, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK:  630 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [55, 89, 89, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  634 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [55, 89, 89, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  638 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [55, 89, 89, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK:  641 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [55, 89, 89, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK:  643 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [55, 89, 89, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK:  647 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [55, 89, 144, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK:  651 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [89, 89, 144, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK:  655 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [89, 144, 144, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK:  658 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [89, 144, 144, 1, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK:  661 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [89, 144, 144, 1, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK:  663 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [89, 144, 144, 1, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK:  667 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [89, 144, 144, 1, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK:  671 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [89, 144, 144, 1, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK:  673 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [89, 144, 144, 1, 44, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK:  676 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [89, 144, 144, 1, 44, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK:  680 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [89, 144, 144, 0, 44, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK:  683 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [89, 144, 144, 0, 44, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK:  686 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [89, 144, 144, 0, 44, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK:  688 IP:  34 AR: 2046 SP: 2046 RR  24 GPR: [89, 144, 144, 0, 44, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	add    r4 r4 r1
+  DEBUG   machine:simulation    TICK:  692 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [89, 144, 144, 0, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK:  696 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [89, 144, 144, 0, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK:  700 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [89, 144, 144, 0, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  704 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [89, 144, 144, 0, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  708 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [89, 144, 144, 0, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK:  711 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [89, 144, 144, 0, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK:  713 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [89, 144, 144, 0, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK:  717 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [89, 144, 233, 0, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK:  721 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [144, 144, 233, 0, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK:  725 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [144, 233, 233, 0, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK:  728 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [144, 233, 233, 0, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK:  731 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [144, 233, 233, 0, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK:  733 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [144, 233, 233, 0, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK:  737 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [144, 233, 233, 0, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK:  741 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [144, 233, 233, 0, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK:  743 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [144, 233, 233, 0, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK:  746 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [144, 233, 233, 0, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK:  750 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [144, 233, 233, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK:  753 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [144, 233, 233, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK:  756 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [144, 233, 233, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK:  758 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [144, 233, 233, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK:  762 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [144, 233, 233, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK:  766 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [144, 233, 233, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  770 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [144, 233, 233, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  774 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [144, 233, 233, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK:  777 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [144, 233, 233, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK:  779 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [144, 233, 233, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK:  783 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [144, 233, 377, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK:  787 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [233, 233, 377, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK:  791 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [233, 377, 377, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK:  794 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [233, 377, 377, 1, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK:  797 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [233, 377, 377, 1, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK:  799 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [233, 377, 377, 1, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK:  803 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [233, 377, 377, 1, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK:  807 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [233, 377, 377, 1, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK:  809 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [233, 377, 377, 1, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK:  812 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [233, 377, 377, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK:  816 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [233, 377, 377, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK:  819 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [233, 377, 377, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK:  822 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [233, 377, 377, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK:  824 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [233, 377, 377, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK:  828 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [233, 377, 377, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK:  832 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [233, 377, 377, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  836 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [233, 377, 377, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  840 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [233, 377, 377, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK:  843 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [233, 377, 377, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK:  845 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [233, 377, 377, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK:  849 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [233, 377, 610, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK:  853 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [377, 377, 610, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK:  857 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [377, 610, 610, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK:  860 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [377, 610, 610, 1, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK:  863 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [377, 610, 610, 1, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK:  865 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [377, 610, 610, 1, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK:  869 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [377, 610, 610, 1, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK:  873 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [377, 610, 610, 1, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK:  875 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [377, 610, 610, 1, 188, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK:  878 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [377, 610, 610, 1, 188, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK:  882 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [377, 610, 610, 0, 188, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK:  885 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [377, 610, 610, 0, 188, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK:  888 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [377, 610, 610, 0, 188, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK:  890 IP:  34 AR: 2046 SP: 2046 RR  24 GPR: [377, 610, 610, 0, 188, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	add    r4 r4 r1
+  DEBUG   machine:simulation    TICK:  894 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [377, 610, 610, 0, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK:  898 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [377, 610, 610, 0, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK:  902 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [377, 610, 610, 0, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  906 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [377, 610, 610, 0, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  910 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [377, 610, 610, 0, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK:  913 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [377, 610, 610, 0, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK:  915 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [377, 610, 610, 0, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK:  919 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [377, 610, 987, 0, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK:  923 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [610, 610, 987, 0, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK:  927 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [610, 987, 987, 0, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK:  930 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [610, 987, 987, 0, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK:  933 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [610, 987, 987, 0, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK:  935 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [610, 987, 987, 0, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK:  939 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [610, 987, 987, 0, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK:  943 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [610, 987, 987, 0, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK:  945 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [610, 987, 987, 0, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK:  948 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [610, 987, 987, 0, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK:  952 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [610, 987, 987, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK:  955 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [610, 987, 987, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK:  958 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [610, 987, 987, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK:  960 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [610, 987, 987, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK:  964 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [610, 987, 987, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK:  968 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [610, 987, 987, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  972 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [610, 987, 987, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK:  976 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [610, 987, 987, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK:  979 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [610, 987, 987, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK:  981 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [610, 987, 987, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK:  985 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [610, 987, 1597, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK:  989 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [987, 987, 1597, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK:  993 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [987, 1597, 1597, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK:  996 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [987, 1597, 1597, 1, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK:  999 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [987, 1597, 1597, 1, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 1001 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [987, 1597, 1597, 1, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 1005 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [987, 1597, 1597, 1, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 1009 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [987, 1597, 1597, 1, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 1011 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [987, 1597, 1597, 1, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 1014 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [987, 1597, 1597, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 1018 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [987, 1597, 1597, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 1021 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [987, 1597, 1597, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 1024 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [987, 1597, 1597, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 1026 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [987, 1597, 1597, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 1030 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [987, 1597, 1597, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 1034 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [987, 1597, 1597, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1038 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [987, 1597, 1597, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1042 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [987, 1597, 1597, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 1045 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [987, 1597, 1597, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 1047 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [987, 1597, 1597, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 1051 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [987, 1597, 2584, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 1055 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [1597, 1597, 2584, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 1059 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [1597, 2584, 2584, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 1062 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [1597, 2584, 2584, 1, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 1065 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [1597, 2584, 2584, 1, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 1067 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [1597, 2584, 2584, 1, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 1071 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [1597, 2584, 2584, 1, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 1075 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [1597, 2584, 2584, 1, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 1077 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [1597, 2584, 2584, 1, 798, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 1080 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [1597, 2584, 2584, 1, 798, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 1084 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [1597, 2584, 2584, 0, 798, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 1087 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [1597, 2584, 2584, 0, 798, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 1090 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [1597, 2584, 2584, 0, 798, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 1092 IP:  34 AR: 2046 SP: 2046 RR  24 GPR: [1597, 2584, 2584, 0, 798, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	add    r4 r4 r1
+  DEBUG   machine:simulation    TICK: 1096 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [1597, 2584, 2584, 0, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 1100 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [1597, 2584, 2584, 0, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 1104 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [1597, 2584, 2584, 0, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1108 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [1597, 2584, 2584, 0, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1112 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [1597, 2584, 2584, 0, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 1115 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [1597, 2584, 2584, 0, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 1117 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [1597, 2584, 2584, 0, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 1121 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [1597, 2584, 4181, 0, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 1125 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [2584, 2584, 4181, 0, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 1129 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [2584, 4181, 4181, 0, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 1132 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [2584, 4181, 4181, 0, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 1135 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [2584, 4181, 4181, 0, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 1137 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [2584, 4181, 4181, 0, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 1141 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [2584, 4181, 4181, 0, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 1145 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [2584, 4181, 4181, 0, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 1147 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [2584, 4181, 4181, 0, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 1150 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [2584, 4181, 4181, 0, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 1154 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [2584, 4181, 4181, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 1157 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [2584, 4181, 4181, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 1160 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [2584, 4181, 4181, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 1162 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [2584, 4181, 4181, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 1166 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [2584, 4181, 4181, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 1170 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [2584, 4181, 4181, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1174 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [2584, 4181, 4181, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1178 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [2584, 4181, 4181, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 1181 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [2584, 4181, 4181, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 1183 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [2584, 4181, 4181, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 1187 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [2584, 4181, 6765, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 1191 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [4181, 4181, 6765, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 1195 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [4181, 6765, 6765, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 1198 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [4181, 6765, 6765, 1, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 1201 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [4181, 6765, 6765, 1, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 1203 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [4181, 6765, 6765, 1, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 1207 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [4181, 6765, 6765, 1, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 1211 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [4181, 6765, 6765, 1, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 1213 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [4181, 6765, 6765, 1, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 1216 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [4181, 6765, 6765, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 1220 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [4181, 6765, 6765, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 1223 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [4181, 6765, 6765, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 1226 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [4181, 6765, 6765, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 1228 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [4181, 6765, 6765, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 1232 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [4181, 6765, 6765, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 1236 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [4181, 6765, 6765, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1240 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [4181, 6765, 6765, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1244 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [4181, 6765, 6765, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 1247 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [4181, 6765, 6765, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 1249 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [4181, 6765, 6765, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 1253 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [4181, 6765, 10946, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 1257 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [6765, 6765, 10946, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 1261 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [6765, 10946, 10946, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 1264 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [6765, 10946, 10946, 1, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 1267 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [6765, 10946, 10946, 1, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 1269 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [6765, 10946, 10946, 1, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 1273 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [6765, 10946, 10946, 1, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 1277 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [6765, 10946, 10946, 1, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 1279 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [6765, 10946, 10946, 1, 3382, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 1282 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [6765, 10946, 10946, 1, 3382, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 1286 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [6765, 10946, 10946, 0, 3382, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 1289 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [6765, 10946, 10946, 0, 3382, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 1292 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [6765, 10946, 10946, 0, 3382, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 1294 IP:  34 AR: 2046 SP: 2046 RR  24 GPR: [6765, 10946, 10946, 0, 3382, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	add    r4 r4 r1
+  DEBUG   machine:simulation    TICK: 1298 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [6765, 10946, 10946, 0, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 1302 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [6765, 10946, 10946, 0, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 1306 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [6765, 10946, 10946, 0, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1310 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [6765, 10946, 10946, 0, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1314 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [6765, 10946, 10946, 0, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 1317 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [6765, 10946, 10946, 0, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 1319 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [6765, 10946, 10946, 0, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 1323 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [6765, 10946, 17711, 0, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 1327 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [10946, 10946, 17711, 0, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 1331 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [10946, 17711, 17711, 0, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 1334 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [10946, 17711, 17711, 0, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 1337 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [10946, 17711, 17711, 0, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 1339 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [10946, 17711, 17711, 0, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 1343 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [10946, 17711, 17711, 0, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 1347 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [10946, 17711, 17711, 0, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 1349 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [10946, 17711, 17711, 0, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 1352 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [10946, 17711, 17711, 0, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 1356 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [10946, 17711, 17711, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 1359 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [10946, 17711, 17711, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 1362 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [10946, 17711, 17711, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 1364 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [10946, 17711, 17711, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 1368 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [10946, 17711, 17711, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 1372 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [10946, 17711, 17711, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1376 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [10946, 17711, 17711, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1380 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [10946, 17711, 17711, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 1383 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [10946, 17711, 17711, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 1385 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [10946, 17711, 17711, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 1389 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [10946, 17711, 28657, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 1393 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [17711, 17711, 28657, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 1397 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [17711, 28657, 28657, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 1400 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [17711, 28657, 28657, 1, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 1403 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [17711, 28657, 28657, 1, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 1405 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [17711, 28657, 28657, 1, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 1409 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [17711, 28657, 28657, 1, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 1413 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [17711, 28657, 28657, 1, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 1415 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [17711, 28657, 28657, 1, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 1418 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [17711, 28657, 28657, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 1422 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [17711, 28657, 28657, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 1425 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [17711, 28657, 28657, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 1428 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [17711, 28657, 28657, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 1430 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [17711, 28657, 28657, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 1434 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [17711, 28657, 28657, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 1438 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [17711, 28657, 28657, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1442 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [17711, 28657, 28657, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1446 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [17711, 28657, 28657, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 1449 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [17711, 28657, 28657, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 1451 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [17711, 28657, 28657, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 1455 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [17711, 28657, 46368, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 1459 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [28657, 28657, 46368, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 1463 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [28657, 46368, 46368, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 1466 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [28657, 46368, 46368, 1, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 1469 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [28657, 46368, 46368, 1, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 1471 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [28657, 46368, 46368, 1, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 1475 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [28657, 46368, 46368, 1, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 1479 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [28657, 46368, 46368, 1, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 1481 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [28657, 46368, 46368, 1, 14328, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 1484 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [28657, 46368, 46368, 1, 14328, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 1488 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [28657, 46368, 46368, 0, 14328, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 1491 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [28657, 46368, 46368, 0, 14328, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 1494 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [28657, 46368, 46368, 0, 14328, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 1496 IP:  34 AR: 2046 SP: 2046 RR  24 GPR: [28657, 46368, 46368, 0, 14328, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	add    r4 r4 r1
+  DEBUG   machine:simulation    TICK: 1500 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [28657, 46368, 46368, 0, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 1504 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [28657, 46368, 46368, 0, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 1508 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [28657, 46368, 46368, 0, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1512 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [28657, 46368, 46368, 0, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1516 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [28657, 46368, 46368, 0, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 1519 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [28657, 46368, 46368, 0, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 1521 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [28657, 46368, 46368, 0, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 1525 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [28657, 46368, 75025, 0, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 1529 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [46368, 46368, 75025, 0, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 1533 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [46368, 75025, 75025, 0, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 1536 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [46368, 75025, 75025, 0, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 1539 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [46368, 75025, 75025, 0, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 1541 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [46368, 75025, 75025, 0, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 1545 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [46368, 75025, 75025, 0, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 1549 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [46368, 75025, 75025, 0, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 1551 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [46368, 75025, 75025, 0, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 1554 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [46368, 75025, 75025, 0, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 1558 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [46368, 75025, 75025, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 1561 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [46368, 75025, 75025, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 1564 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [46368, 75025, 75025, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 1566 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [46368, 75025, 75025, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 1570 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [46368, 75025, 75025, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 1574 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [46368, 75025, 75025, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1578 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [46368, 75025, 75025, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1582 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [46368, 75025, 75025, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 1585 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [46368, 75025, 75025, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 1587 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [46368, 75025, 75025, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 1591 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [46368, 75025, 121393, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 1595 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [75025, 75025, 121393, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 1599 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [75025, 121393, 121393, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 1602 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [75025, 121393, 121393, 1, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 1605 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [75025, 121393, 121393, 1, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 1607 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [75025, 121393, 121393, 1, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 1611 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [75025, 121393, 121393, 1, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 1615 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [75025, 121393, 121393, 1, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 1617 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [75025, 121393, 121393, 1, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 1620 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [75025, 121393, 121393, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 1624 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [75025, 121393, 121393, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 1627 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [75025, 121393, 121393, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 1630 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [75025, 121393, 121393, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 1632 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [75025, 121393, 121393, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 1636 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [75025, 121393, 121393, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 1640 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [75025, 121393, 121393, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1644 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [75025, 121393, 121393, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1648 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [75025, 121393, 121393, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 1651 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [75025, 121393, 121393, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 1653 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [75025, 121393, 121393, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 1657 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [75025, 121393, 196418, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 1661 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [121393, 121393, 196418, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 1665 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [121393, 196418, 196418, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 1668 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [121393, 196418, 196418, 1, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 1671 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [121393, 196418, 196418, 1, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 1673 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [121393, 196418, 196418, 1, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 1677 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [121393, 196418, 196418, 1, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 1681 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [121393, 196418, 196418, 1, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 1683 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [121393, 196418, 196418, 1, 60696, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 1686 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [121393, 196418, 196418, 1, 60696, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 1690 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [121393, 196418, 196418, 0, 60696, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 1693 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [121393, 196418, 196418, 0, 60696, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 1696 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [121393, 196418, 196418, 0, 60696, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 1698 IP:  34 AR: 2046 SP: 2046 RR  24 GPR: [121393, 196418, 196418, 0, 60696, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	add    r4 r4 r1
+  DEBUG   machine:simulation    TICK: 1702 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [121393, 196418, 196418, 0, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 1706 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [121393, 196418, 196418, 0, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 1710 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [121393, 196418, 196418, 0, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1714 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [121393, 196418, 196418, 0, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1718 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [121393, 196418, 196418, 0, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 1721 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [121393, 196418, 196418, 0, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 1723 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [121393, 196418, 196418, 0, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 1727 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [121393, 196418, 317811, 0, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 1731 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [196418, 196418, 317811, 0, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 1735 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [196418, 317811, 317811, 0, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 1738 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [196418, 317811, 317811, 0, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 1741 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [196418, 317811, 317811, 0, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 1743 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [196418, 317811, 317811, 0, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 1747 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [196418, 317811, 317811, 0, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 1751 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [196418, 317811, 317811, 0, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 1753 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [196418, 317811, 317811, 0, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 1756 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [196418, 317811, 317811, 0, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 1760 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [196418, 317811, 317811, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 1763 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [196418, 317811, 317811, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 1766 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [196418, 317811, 317811, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 1768 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [196418, 317811, 317811, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 1772 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [196418, 317811, 317811, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 1776 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [196418, 317811, 317811, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1780 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [196418, 317811, 317811, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1784 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [196418, 317811, 317811, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 1787 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [196418, 317811, 317811, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 1789 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [196418, 317811, 317811, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 1793 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [196418, 317811, 514229, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 1797 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [317811, 317811, 514229, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 1801 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [317811, 514229, 514229, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 1804 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [317811, 514229, 514229, 1, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 1807 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [317811, 514229, 514229, 1, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 1809 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [317811, 514229, 514229, 1, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 1813 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [317811, 514229, 514229, 1, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 1817 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [317811, 514229, 514229, 1, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 1819 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [317811, 514229, 514229, 1, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 1822 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [317811, 514229, 514229, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 1826 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [317811, 514229, 514229, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 1829 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [317811, 514229, 514229, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 1832 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [317811, 514229, 514229, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 1834 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [317811, 514229, 514229, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 1838 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [317811, 514229, 514229, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 1842 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [317811, 514229, 514229, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1846 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [317811, 514229, 514229, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1850 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [317811, 514229, 514229, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 1853 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [317811, 514229, 514229, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 1855 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [317811, 514229, 514229, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 1859 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [317811, 514229, 832040, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 1863 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [514229, 514229, 832040, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 1867 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [514229, 832040, 832040, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 1870 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [514229, 832040, 832040, 1, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 1873 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [514229, 832040, 832040, 1, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 1875 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [514229, 832040, 832040, 1, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 1879 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [514229, 832040, 832040, 1, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 1883 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [514229, 832040, 832040, 1, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 1885 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [514229, 832040, 832040, 1, 257114, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 1888 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [514229, 832040, 832040, 1, 257114, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 1892 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [514229, 832040, 832040, 0, 257114, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 1895 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [514229, 832040, 832040, 0, 257114, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 1898 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [514229, 832040, 832040, 0, 257114, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 1900 IP:  34 AR: 2046 SP: 2046 RR  24 GPR: [514229, 832040, 832040, 0, 257114, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	add    r4 r4 r1
+  DEBUG   machine:simulation    TICK: 1904 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [514229, 832040, 832040, 0, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 1908 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [514229, 832040, 832040, 0, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 1912 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [514229, 832040, 832040, 0, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1916 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [514229, 832040, 832040, 0, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1920 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [514229, 832040, 832040, 0, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 1923 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [514229, 832040, 832040, 0, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 1925 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [514229, 832040, 832040, 0, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 1929 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [514229, 832040, 1346269, 0, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 1933 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [832040, 832040, 1346269, 0, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 1937 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [832040, 1346269, 1346269, 0, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 1940 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [832040, 1346269, 1346269, 0, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 1943 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [832040, 1346269, 1346269, 0, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 1945 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [832040, 1346269, 1346269, 0, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 1949 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [832040, 1346269, 1346269, 0, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 1953 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [832040, 1346269, 1346269, 0, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 1955 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [832040, 1346269, 1346269, 0, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 1958 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [832040, 1346269, 1346269, 0, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 1962 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [832040, 1346269, 1346269, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 1965 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [832040, 1346269, 1346269, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 1968 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [832040, 1346269, 1346269, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 1970 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [832040, 1346269, 1346269, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 1974 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [832040, 1346269, 1346269, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 1978 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [832040, 1346269, 1346269, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1982 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [832040, 1346269, 1346269, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 1986 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [832040, 1346269, 1346269, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 1989 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [832040, 1346269, 1346269, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 1991 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [832040, 1346269, 1346269, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 1995 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [832040, 1346269, 2178309, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 1999 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [1346269, 1346269, 2178309, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 2003 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [1346269, 2178309, 2178309, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 2006 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [1346269, 2178309, 2178309, 1, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 2009 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [1346269, 2178309, 2178309, 1, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 2011 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [1346269, 2178309, 2178309, 1, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 2015 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [1346269, 2178309, 2178309, 1, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 2019 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [1346269, 2178309, 2178309, 1, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 2021 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [1346269, 2178309, 2178309, 1, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 2024 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [1346269, 2178309, 2178309, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 2028 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [1346269, 2178309, 2178309, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 2031 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [1346269, 2178309, 2178309, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 2034 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [1346269, 2178309, 2178309, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 2036 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [1346269, 2178309, 2178309, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 2040 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [1346269, 2178309, 2178309, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 2044 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [1346269, 2178309, 2178309, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 2048 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [1346269, 2178309, 2178309, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 2052 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [1346269, 2178309, 2178309, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 2055 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [1346269, 2178309, 2178309, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 2057 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [1346269, 2178309, 2178309, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 2061 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [1346269, 2178309, 3524578, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 2065 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [2178309, 2178309, 3524578, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 2069 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [2178309, 3524578, 3524578, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 2072 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [2178309, 3524578, 3524578, 1, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 2075 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [2178309, 3524578, 3524578, 1, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 2077 IP:  21 AR: 2046 SP: 2047 RR  24 GPR: [2178309, 3524578, 3524578, 1, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 2081 IP:  22 AR: 2046 SP: 2046 RR  24 GPR: [2178309, 3524578, 3524578, 1, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 2085 IP:  23 AR: 2046 SP: 2046 RR  24 GPR: [2178309, 3524578, 3524578, 1, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    29
+  DEBUG   machine:simulation    TICK: 2087 IP:  29 AR: 2046 SP: 2046 RR  24 GPR: [2178309, 3524578, 3524578, 1, 1089154, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 2
+  DEBUG   machine:simulation    TICK: 2090 IP:  30 AR: 2046 SP: 2046 RR  24 GPR: [2178309, 3524578, 3524578, 1, 1089154, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mod    r3 r1 r5
+  DEBUG   machine:simulation    TICK: 2094 IP:  31 AR: 2046 SP: 2046 RR  24 GPR: [2178309, 3524578, 3524578, 0, 1089154, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	li     r6 0
+  DEBUG   machine:simulation    TICK: 2097 IP:  32 AR: 2046 SP: 2046 RR  24 GPR: [2178309, 3524578, 3524578, 0, 1089154, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	cmp    r3 r6
+  DEBUG   machine:simulation    TICK: 2100 IP:  33 AR: 2046 SP: 2046 RR  24 GPR: [2178309, 3524578, 3524578, 0, 1089154, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	jnz    35
+  DEBUG   machine:simulation    TICK: 2102 IP:  34 AR: 2046 SP: 2046 RR  24 GPR: [2178309, 3524578, 3524578, 0, 1089154, 2, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 22 	add    r4 r4 r1
+  DEBUG   machine:simulation    TICK: 2106 IP:  35 AR: 2046 SP: 2046 RR  24 GPR: [2178309, 3524578, 3524578, 0, 4613732, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 2110 IP:  36 AR: 2046 SP: 2046 RR  22 GPR: [2178309, 3524578, 3524578, 0, 4613732, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    sp
+  DEBUG   machine:simulation    TICK: 2114 IP:  37 AR: 2046 SP: 2047 RR  22 GPR: [2178309, 3524578, 3524578, 0, 4613732, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 2118 IP:  38 AR: 2046 SP: 2047 RR  23 GPR: [2178309, 3524578, 3524578, 0, 4613732, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	inc    rr
+  DEBUG   machine:simulation    TICK: 2122 IP:  39 AR: 2046 SP: 2047 RR  24 GPR: [2178309, 3524578, 3524578, 0, 4613732, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    rr
+  DEBUG   machine:simulation    TICK: 2125 IP:  24 AR: 2046 SP: 2047 RR  24 GPR: [2178309, 3524578, 3524578, 0, 4613732, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	jmp    15
+  DEBUG   machine:simulation    TICK: 2127 IP:  15 AR: 2046 SP: 2047 RR  24 GPR: [2178309, 3524578, 3524578, 0, 4613732, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	add    r2 r1 r0
+  DEBUG   machine:simulation    TICK: 2131 IP:  16 AR: 2046 SP: 2047 RR  24 GPR: [2178309, 3524578, 5702887, 0, 4613732, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r0 r1
+  DEBUG   machine:simulation    TICK: 2135 IP:  17 AR: 2046 SP: 2047 RR  24 GPR: [3524578, 3524578, 5702887, 0, 4613732, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	mov    r1 r2
+  DEBUG   machine:simulation    TICK: 2139 IP:  18 AR: 2046 SP: 2047 RR  24 GPR: [3524578, 5702887, 5702887, 0, 4613732, 2, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	li     r5 4000000
+  DEBUG   machine:simulation    TICK: 2142 IP:  19 AR: 2046 SP: 2047 RR  24 GPR: [3524578, 5702887, 5702887, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	cmp    r5 r1
+  DEBUG   machine:simulation    TICK: 2145 IP:  20 AR: 2046 SP: 2047 RR  24 GPR: [3524578, 5702887, 5702887, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=1 MEM_OUT: 22 	jn     25
+  DEBUG   machine:simulation    TICK: 2147 IP:  25 AR: 2046 SP: 2047 RR  24 GPR: [3524578, 5702887, 5702887, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=1 MEM_OUT: 22 	dec    sp
+  DEBUG   machine:simulation    TICK: 2151 IP:  26 AR: 2046 SP: 2046 RR  24 GPR: [3524578, 5702887, 5702887, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 22 	store  ip sp
+  DEBUG   machine:simulation    TICK: 2155 IP:  27 AR: 2046 SP: 2046 RR  24 GPR: [3524578, 5702887, 5702887, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	jmp    40
+  DEBUG   machine:simulation    TICK: 2157 IP:  40 AR: 2046 SP: 2046 RR  24 GPR: [3524578, 5702887, 5702887, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	li     r0 1
+  DEBUG   machine:simulation    TICK: 2160 IP:  41 AR: 2046 SP: 2046 RR  24 GPR: [1, 5702887, 5702887, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	li     r2 10
+  DEBUG   machine:simulation    TICK: 2163 IP:  42 AR: 2046 SP: 2046 RR  24 GPR: [1, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	mul    r0 r0 r2
+  DEBUG   machine:simulation    TICK: 2167 IP:  43 AR: 2046 SP: 2046 RR  24 GPR: [10, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	cmp    r4 r0
+  DEBUG   machine:simulation    TICK: 2170 IP:  44 AR: 2046 SP: 2046 RR  24 GPR: [10, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	jnn    42
+  DEBUG   machine:simulation    TICK: 2172 IP:  42 AR: 2046 SP: 2046 RR  24 GPR: [10, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	mul    r0 r0 r2
+  DEBUG   machine:simulation    TICK: 2176 IP:  43 AR: 2046 SP: 2046 RR  24 GPR: [100, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	cmp    r4 r0
+  DEBUG   machine:simulation    TICK: 2179 IP:  44 AR: 2046 SP: 2046 RR  24 GPR: [100, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	jnn    42
+  DEBUG   machine:simulation    TICK: 2181 IP:  42 AR: 2046 SP: 2046 RR  24 GPR: [100, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	mul    r0 r0 r2
+  DEBUG   machine:simulation    TICK: 2185 IP:  43 AR: 2046 SP: 2046 RR  24 GPR: [1000, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	cmp    r4 r0
+  DEBUG   machine:simulation    TICK: 2188 IP:  44 AR: 2046 SP: 2046 RR  24 GPR: [1000, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	jnn    42
+  DEBUG   machine:simulation    TICK: 2190 IP:  42 AR: 2046 SP: 2046 RR  24 GPR: [1000, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	mul    r0 r0 r2
+  DEBUG   machine:simulation    TICK: 2194 IP:  43 AR: 2046 SP: 2046 RR  24 GPR: [10000, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	cmp    r4 r0
+  DEBUG   machine:simulation    TICK: 2197 IP:  44 AR: 2046 SP: 2046 RR  24 GPR: [10000, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	jnn    42
+  DEBUG   machine:simulation    TICK: 2199 IP:  42 AR: 2046 SP: 2046 RR  24 GPR: [10000, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	mul    r0 r0 r2
+  DEBUG   machine:simulation    TICK: 2203 IP:  43 AR: 2046 SP: 2046 RR  24 GPR: [100000, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	cmp    r4 r0
+  DEBUG   machine:simulation    TICK: 2206 IP:  44 AR: 2046 SP: 2046 RR  24 GPR: [100000, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	jnn    42
+  DEBUG   machine:simulation    TICK: 2208 IP:  42 AR: 2046 SP: 2046 RR  24 GPR: [100000, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	mul    r0 r0 r2
+  DEBUG   machine:simulation    TICK: 2212 IP:  43 AR: 2046 SP: 2046 RR  24 GPR: [1000000, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	cmp    r4 r0
+  DEBUG   machine:simulation    TICK: 2215 IP:  44 AR: 2046 SP: 2046 RR  24 GPR: [1000000, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	jnn    42
+  DEBUG   machine:simulation    TICK: 2217 IP:  42 AR: 2046 SP: 2046 RR  24 GPR: [1000000, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	mul    r0 r0 r2
+  DEBUG   machine:simulation    TICK: 2221 IP:  43 AR: 2046 SP: 2046 RR  24 GPR: [10000000, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	cmp    r4 r0
+  DEBUG   machine:simulation    TICK: 2224 IP:  44 AR: 2046 SP: 2046 RR  24 GPR: [10000000, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=1 MEM_OUT: 26 	jnn    42
+  DEBUG   machine:simulation    TICK: 2226 IP:  45 AR: 2046 SP: 2046 RR  24 GPR: [10000000, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=1 MEM_OUT: 26 	div    r0 r0 r2
+  DEBUG   machine:simulation    TICK: 2230 IP:  46 AR: 2046 SP: 2046 RR  24 GPR: [1000000, 5702887, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	li     r1 48
+  DEBUG   machine:simulation    TICK: 2233 IP:  47 AR: 2046 SP: 2046 RR  24 GPR: [1000000, 48, 10, 0, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	div    r3 r4 r0
+  DEBUG   machine:simulation    TICK: 2237 IP:  48 AR: 2046 SP: 2046 RR  24 GPR: [1000000, 48, 10, 4, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	add    r3 r3 r1
+  DEBUG   machine:simulation    TICK: 2241 IP:  49 AR: 2046 SP: 2046 RR  24 GPR: [1000000, 48, 10, 52, 4613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	mod    r4 r4 r0
+  DEBUG   machine:simulation    TICK: 2245 IP:  50 AR: 2046 SP: 2046 RR  24 GPR: [1000000, 48, 10, 52, 613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	div    r0 r0 r2
+  DEBUG   machine:simulation    TICK: 2249 IP:  51 AR: 2046 SP: 2046 RR  24 GPR: [100000, 48, 10, 52, 613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	output r3
+  DEBUG   machine:execute_output output: '4' << '4'
+  DEBUG   machine:simulation    TICK: 2253 IP:  52 AR:    2 SP: 2046 RR  24 GPR: [100000, 48, 10, 52, 613732, 4000000, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 52 	li     r5 0
+  DEBUG   machine:simulation    TICK: 2256 IP:  53 AR:    2 SP: 2046 RR  24 GPR: [100000, 48, 10, 52, 613732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 52 	cmp    r0 r5
+  DEBUG   machine:simulation    TICK: 2259 IP:  54 AR:    2 SP: 2046 RR  24 GPR: [100000, 48, 10, 52, 613732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 52 	jz     56
+  DEBUG   machine:simulation    TICK: 2261 IP:  55 AR:    2 SP: 2046 RR  24 GPR: [100000, 48, 10, 52, 613732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 52 	jmp    47
+  DEBUG   machine:simulation    TICK: 2263 IP:  47 AR:    2 SP: 2046 RR  24 GPR: [100000, 48, 10, 52, 613732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 52 	div    r3 r4 r0
+  DEBUG   machine:simulation    TICK: 2267 IP:  48 AR:    2 SP: 2046 RR  24 GPR: [100000, 48, 10, 6, 613732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 52 	add    r3 r3 r1
+  DEBUG   machine:simulation    TICK: 2271 IP:  49 AR:    2 SP: 2046 RR  24 GPR: [100000, 48, 10, 54, 613732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 52 	mod    r4 r4 r0
+  DEBUG   machine:simulation    TICK: 2275 IP:  50 AR:    2 SP: 2046 RR  24 GPR: [100000, 48, 10, 54, 13732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 52 	div    r0 r0 r2
+  DEBUG   machine:simulation    TICK: 2279 IP:  51 AR:    2 SP: 2046 RR  24 GPR: [10000, 48, 10, 54, 13732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 52 	output r3
+  DEBUG   machine:execute_output output: '46' << '6'
+  DEBUG   machine:simulation    TICK: 2283 IP:  52 AR:    2 SP: 2046 RR  24 GPR: [10000, 48, 10, 54, 13732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 54 	li     r5 0
+  DEBUG   machine:simulation    TICK: 2286 IP:  53 AR:    2 SP: 2046 RR  24 GPR: [10000, 48, 10, 54, 13732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 54 	cmp    r0 r5
+  DEBUG   machine:simulation    TICK: 2289 IP:  54 AR:    2 SP: 2046 RR  24 GPR: [10000, 48, 10, 54, 13732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 54 	jz     56
+  DEBUG   machine:simulation    TICK: 2291 IP:  55 AR:    2 SP: 2046 RR  24 GPR: [10000, 48, 10, 54, 13732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 54 	jmp    47
+  DEBUG   machine:simulation    TICK: 2293 IP:  47 AR:    2 SP: 2046 RR  24 GPR: [10000, 48, 10, 54, 13732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 54 	div    r3 r4 r0
+  DEBUG   machine:simulation    TICK: 2297 IP:  48 AR:    2 SP: 2046 RR  24 GPR: [10000, 48, 10, 1, 13732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 54 	add    r3 r3 r1
+  DEBUG   machine:simulation    TICK: 2301 IP:  49 AR:    2 SP: 2046 RR  24 GPR: [10000, 48, 10, 49, 13732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 54 	mod    r4 r4 r0
+  DEBUG   machine:simulation    TICK: 2305 IP:  50 AR:    2 SP: 2046 RR  24 GPR: [10000, 48, 10, 49, 3732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 54 	div    r0 r0 r2
+  DEBUG   machine:simulation    TICK: 2309 IP:  51 AR:    2 SP: 2046 RR  24 GPR: [1000, 48, 10, 49, 3732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 54 	output r3
+  DEBUG   machine:execute_output output: '461' << '1'
+  DEBUG   machine:simulation    TICK: 2313 IP:  52 AR:    2 SP: 2046 RR  24 GPR: [1000, 48, 10, 49, 3732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 49 	li     r5 0
+  DEBUG   machine:simulation    TICK: 2316 IP:  53 AR:    2 SP: 2046 RR  24 GPR: [1000, 48, 10, 49, 3732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 49 	cmp    r0 r5
+  DEBUG   machine:simulation    TICK: 2319 IP:  54 AR:    2 SP: 2046 RR  24 GPR: [1000, 48, 10, 49, 3732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 49 	jz     56
+  DEBUG   machine:simulation    TICK: 2321 IP:  55 AR:    2 SP: 2046 RR  24 GPR: [1000, 48, 10, 49, 3732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 49 	jmp    47
+  DEBUG   machine:simulation    TICK: 2323 IP:  47 AR:    2 SP: 2046 RR  24 GPR: [1000, 48, 10, 49, 3732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 49 	div    r3 r4 r0
+  DEBUG   machine:simulation    TICK: 2327 IP:  48 AR:    2 SP: 2046 RR  24 GPR: [1000, 48, 10, 3, 3732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 49 	add    r3 r3 r1
+  DEBUG   machine:simulation    TICK: 2331 IP:  49 AR:    2 SP: 2046 RR  24 GPR: [1000, 48, 10, 51, 3732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 49 	mod    r4 r4 r0
+  DEBUG   machine:simulation    TICK: 2335 IP:  50 AR:    2 SP: 2046 RR  24 GPR: [1000, 48, 10, 51, 732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 49 	div    r0 r0 r2
+  DEBUG   machine:simulation    TICK: 2339 IP:  51 AR:    2 SP: 2046 RR  24 GPR: [100, 48, 10, 51, 732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 49 	output r3
+  DEBUG   machine:execute_output output: '4613' << '3'
+  DEBUG   machine:simulation    TICK: 2343 IP:  52 AR:    2 SP: 2046 RR  24 GPR: [100, 48, 10, 51, 732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 51 	li     r5 0
+  DEBUG   machine:simulation    TICK: 2346 IP:  53 AR:    2 SP: 2046 RR  24 GPR: [100, 48, 10, 51, 732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 51 	cmp    r0 r5
+  DEBUG   machine:simulation    TICK: 2349 IP:  54 AR:    2 SP: 2046 RR  24 GPR: [100, 48, 10, 51, 732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 51 	jz     56
+  DEBUG   machine:simulation    TICK: 2351 IP:  55 AR:    2 SP: 2046 RR  24 GPR: [100, 48, 10, 51, 732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 51 	jmp    47
+  DEBUG   machine:simulation    TICK: 2353 IP:  47 AR:    2 SP: 2046 RR  24 GPR: [100, 48, 10, 51, 732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 51 	div    r3 r4 r0
+  DEBUG   machine:simulation    TICK: 2357 IP:  48 AR:    2 SP: 2046 RR  24 GPR: [100, 48, 10, 7, 732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 51 	add    r3 r3 r1
+  DEBUG   machine:simulation    TICK: 2361 IP:  49 AR:    2 SP: 2046 RR  24 GPR: [100, 48, 10, 55, 732, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 51 	mod    r4 r4 r0
+  DEBUG   machine:simulation    TICK: 2365 IP:  50 AR:    2 SP: 2046 RR  24 GPR: [100, 48, 10, 55, 32, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 51 	div    r0 r0 r2
+  DEBUG   machine:simulation    TICK: 2369 IP:  51 AR:    2 SP: 2046 RR  24 GPR: [10, 48, 10, 55, 32, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 51 	output r3
+  DEBUG   machine:execute_output output: '46137' << '7'
+  DEBUG   machine:simulation    TICK: 2373 IP:  52 AR:    2 SP: 2046 RR  24 GPR: [10, 48, 10, 55, 32, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 55 	li     r5 0
+  DEBUG   machine:simulation    TICK: 2376 IP:  53 AR:    2 SP: 2046 RR  24 GPR: [10, 48, 10, 55, 32, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 55 	cmp    r0 r5
+  DEBUG   machine:simulation    TICK: 2379 IP:  54 AR:    2 SP: 2046 RR  24 GPR: [10, 48, 10, 55, 32, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 55 	jz     56
+  DEBUG   machine:simulation    TICK: 2381 IP:  55 AR:    2 SP: 2046 RR  24 GPR: [10, 48, 10, 55, 32, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 55 	jmp    47
+  DEBUG   machine:simulation    TICK: 2383 IP:  47 AR:    2 SP: 2046 RR  24 GPR: [10, 48, 10, 55, 32, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 55 	div    r3 r4 r0
+  DEBUG   machine:simulation    TICK: 2387 IP:  48 AR:    2 SP: 2046 RR  24 GPR: [10, 48, 10, 3, 32, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 55 	add    r3 r3 r1
+  DEBUG   machine:simulation    TICK: 2391 IP:  49 AR:    2 SP: 2046 RR  24 GPR: [10, 48, 10, 51, 32, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 55 	mod    r4 r4 r0
+  DEBUG   machine:simulation    TICK: 2395 IP:  50 AR:    2 SP: 2046 RR  24 GPR: [10, 48, 10, 51, 2, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 55 	div    r0 r0 r2
+  DEBUG   machine:simulation    TICK: 2399 IP:  51 AR:    2 SP: 2046 RR  24 GPR: [1, 48, 10, 51, 2, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 55 	output r3
+  DEBUG   machine:execute_output output: '461373' << '3'
+  DEBUG   machine:simulation    TICK: 2403 IP:  52 AR:    2 SP: 2046 RR  24 GPR: [1, 48, 10, 51, 2, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 51 	li     r5 0
+  DEBUG   machine:simulation    TICK: 2406 IP:  53 AR:    2 SP: 2046 RR  24 GPR: [1, 48, 10, 51, 2, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 51 	cmp    r0 r5
+  DEBUG   machine:simulation    TICK: 2409 IP:  54 AR:    2 SP: 2046 RR  24 GPR: [1, 48, 10, 51, 2, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 51 	jz     56
+  DEBUG   machine:simulation    TICK: 2411 IP:  55 AR:    2 SP: 2046 RR  24 GPR: [1, 48, 10, 51, 2, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 51 	jmp    47
+  DEBUG   machine:simulation    TICK: 2413 IP:  47 AR:    2 SP: 2046 RR  24 GPR: [1, 48, 10, 51, 2, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 51 	div    r3 r4 r0
+  DEBUG   machine:simulation    TICK: 2417 IP:  48 AR:    2 SP: 2046 RR  24 GPR: [1, 48, 10, 2, 2, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 51 	add    r3 r3 r1
+  DEBUG   machine:simulation    TICK: 2421 IP:  49 AR:    2 SP: 2046 RR  24 GPR: [1, 48, 10, 50, 2, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 51 	mod    r4 r4 r0
+  DEBUG   machine:simulation    TICK: 2425 IP:  50 AR:    2 SP: 2046 RR  24 GPR: [1, 48, 10, 50, 0, 0, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 51 	div    r0 r0 r2
+  DEBUG   machine:simulation    TICK: 2429 IP:  51 AR:    2 SP: 2046 RR  24 GPR: [0, 48, 10, 50, 0, 0, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 51 	output r3
+  DEBUG   machine:execute_output output: '4613732' << '2'
+  DEBUG   machine:simulation    TICK: 2433 IP:  52 AR:    2 SP: 2046 RR  24 GPR: [0, 48, 10, 50, 0, 0, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 50 	li     r5 0
+  DEBUG   machine:simulation    TICK: 2436 IP:  53 AR:    2 SP: 2046 RR  24 GPR: [0, 48, 10, 50, 0, 0, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 50 	cmp    r0 r5
+  DEBUG   machine:simulation    TICK: 2439 IP:  54 AR:    2 SP: 2046 RR  24 GPR: [0, 48, 10, 50, 0, 0, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 50 	jz     56
+  DEBUG   machine:simulation    TICK: 2441 IP:  56 AR:    2 SP: 2046 RR  24 GPR: [0, 48, 10, 50, 0, 0, 0, 0] FLAGS: Z=1 N=0 MEM_OUT: 50 	ld     rr sp
+  DEBUG   machine:simulation    TICK: 2445 IP:  57 AR: 2046 SP: 2046 RR  26 GPR: [0, 48, 10, 50, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	inc    sp
+  DEBUG   machine:simulation    TICK: 2449 IP:  58 AR: 2046 SP: 2047 RR  26 GPR: [0, 48, 10, 50, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	inc    rr
+  DEBUG   machine:simulation    TICK: 2453 IP:  59 AR: 2046 SP: 2047 RR  27 GPR: [0, 48, 10, 50, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	inc    rr
+  DEBUG   machine:simulation    TICK: 2457 IP:  60 AR: 2046 SP: 2047 RR  28 GPR: [0, 48, 10, 50, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	jmp    rr
+  DEBUG   machine:simulation    TICK: 2460 IP:  28 AR: 2046 SP: 2047 RR  28 GPR: [0, 48, 10, 50, 0, 0, 0, 0] FLAGS: Z=0 N=0 MEM_OUT: 26 	halt  
+  INFO    machine:simulation    output_buffer: '4613732'

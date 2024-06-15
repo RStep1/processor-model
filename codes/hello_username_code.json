@@ -1,1056 +1,127 @@
-[
-    {
-        "index": 0,
-        "name": "jmp",
-        "args": [
-            null,
-            null,
-            null,
-            "73"
-        ]
-    },
-    {
-        "index": 1,
-        "name": "input_port",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 2,
-        "name": "output_port",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 3,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 4,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 5,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 6,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 7,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 8,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 9,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 10,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 11,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 12,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 13,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 14,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 15,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 16,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 17,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 18,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 19,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 20,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 21,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 22,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 23,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 24,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 25,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 26,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 27,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 28,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 29,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 30,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 31,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 32,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 33,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 34,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 35,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 36,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 37,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 38,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 39,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 40,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 41,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 42,
-        "name": "username",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 43,
-        "name": "request",
-        "args": [
-            87
-        ]
-    },
-    {
-        "index": 44,
-        "name": "request",
-        "args": [
-            104
-        ]
-    },
-    {
-        "index": 45,
-        "name": "request",
-        "args": [
-            97
-        ]
-    },
-    {
-        "index": 46,
-        "name": "request",
-        "args": [
-            116
-        ]
-    },
-    {
-        "index": 47,
-        "name": "request",
-        "args": [
-            32
-        ]
-    },
-    {
-        "index": 48,
-        "name": "request",
-        "args": [
-            105
-        ]
-    },
-    {
-        "index": 49,
-        "name": "request",
-        "args": [
-            115
-        ]
-    },
-    {
-        "index": 50,
-        "name": "request",
-        "args": [
-            32
-        ]
-    },
-    {
-        "index": 51,
-        "name": "request",
-        "args": [
-            121
-        ]
-    },
-    {
-        "index": 52,
-        "name": "request",
-        "args": [
-            111
-        ]
-    },
-    {
-        "index": 53,
-        "name": "request",
-        "args": [
-            117
-        ]
-    },
-    {
-        "index": 54,
-        "name": "request",
-        "args": [
-            114
-        ]
-    },
-    {
-        "index": 55,
-        "name": "request",
-        "args": [
-            32
-        ]
-    },
-    {
-        "index": 56,
-        "name": "request",
-        "args": [
-            110
-        ]
-    },
-    {
-        "index": 57,
-        "name": "request",
-        "args": [
-            97
-        ]
-    },
-    {
-        "index": 58,
-        "name": "request",
-        "args": [
-            109
-        ]
-    },
-    {
-        "index": 59,
-        "name": "request",
-        "args": [
-            101
-        ]
-    },
-    {
-        "index": 60,
-        "name": "request",
-        "args": [
-            63
-        ]
-    },
-    {
-        "index": 61,
-        "name": "request",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 62,
-        "name": "greeting",
-        "args": [
-            72
-        ]
-    },
-    {
-        "index": 63,
-        "name": "greeting",
-        "args": [
-            101
-        ]
-    },
-    {
-        "index": 64,
-        "name": "greeting",
-        "args": [
-            108
-        ]
-    },
-    {
-        "index": 65,
-        "name": "greeting",
-        "args": [
-            108
-        ]
-    },
-    {
-        "index": 66,
-        "name": "greeting",
-        "args": [
-            111
-        ]
-    },
-    {
-        "index": 67,
-        "name": "greeting",
-        "args": [
-            44
-        ]
-    },
-    {
-        "index": 68,
-        "name": "greeting",
-        "args": [
-            32
-        ]
-    },
-    {
-        "index": 69,
-        "name": "greeting",
-        "args": [
-            0
-        ]
-    },
-    {
-        "index": 70,
-        "name": "username_ptr",
-        "args": [
-            3
-        ]
-    },
-    {
-        "index": 71,
-        "name": "request_ptr",
-        "args": [
-            43
-        ]
-    },
-    {
-        "index": 72,
-        "name": "greeting_ptr",
-        "args": [
-            62
-        ]
-    },
-    {
-        "index": 73,
-        "name": "li",
-        "args": [
-            "r1",
-            null,
-            null,
-            "43"
-        ]
-    },
-    {
-        "index": 74,
-        "name": "dec",
-        "args": [
-            "sp",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 75,
-        "name": "store",
-        "args": [
-            "ip",
-            null,
-            null,
-            "sp"
-        ]
-    },
-    {
-        "index": 76,
-        "name": "jmp",
-        "args": [
-            null,
-            null,
-            null,
-            "108"
-        ]
-    },
-    {
-        "index": 77,
-        "name": "dec",
-        "args": [
-            "sp",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 78,
-        "name": "store",
-        "args": [
-            "ip",
-            null,
-            null,
-            "sp"
-        ]
-    },
-    {
-        "index": 79,
-        "name": "jmp",
-        "args": [
-            null,
-            null,
-            null,
-            "120"
-        ]
-    },
-    {
-        "index": 80,
-        "name": "dec",
-        "args": [
-            "sp",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 81,
-        "name": "store",
-        "args": [
-            "ip",
-            null,
-            null,
-            "sp"
-        ]
-    },
-    {
-        "index": 82,
-        "name": "jmp",
-        "args": [
-            null,
-            null,
-            null,
-            "95"
-        ]
-    },
-    {
-        "index": 83,
-        "name": "li",
-        "args": [
-            "r1",
-            null,
-            null,
-            "62"
-        ]
-    },
-    {
-        "index": 84,
-        "name": "dec",
-        "args": [
-            "sp",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 85,
-        "name": "store",
-        "args": [
-            "ip",
-            null,
-            null,
-            "sp"
-        ]
-    },
-    {
-        "index": 86,
-        "name": "jmp",
-        "args": [
-            null,
-            null,
-            null,
-            "108"
-        ]
-    },
-    {
-        "index": 87,
-        "name": "li",
-        "args": [
-            "r1",
-            null,
-            null,
-            "3"
-        ]
-    },
-    {
-        "index": 88,
-        "name": "dec",
-        "args": [
-            "sp",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 89,
-        "name": "store",
-        "args": [
-            "ip",
-            null,
-            null,
-            "sp"
-        ]
-    },
-    {
-        "index": 90,
-        "name": "jmp",
-        "args": [
-            null,
-            null,
-            null,
-            "108"
-        ]
-    },
-    {
-        "index": 91,
-        "name": "dec",
-        "args": [
-            "sp",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 92,
-        "name": "store",
-        "args": [
-            "ip",
-            null,
-            null,
-            "sp"
-        ]
-    },
-    {
-        "index": 93,
-        "name": "jmp",
-        "args": [
-            null,
-            null,
-            null,
-            "120"
-        ]
-    },
-    {
-        "index": 94,
-        "name": "halt",
-        "args": [
-            null,
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 95,
-        "name": "li",
-        "args": [
-            "r1",
-            null,
-            null,
-            "3"
-        ]
-    },
-    {
-        "index": 96,
-        "name": "li",
-        "args": [
-            "r2",
-            null,
-            null,
-            "0"
-        ]
-    },
-    {
-        "index": 97,
-        "name": "input",
-        "args": [
-            "r0",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 98,
-        "name": "cmp",
-        "args": [
-            "r0",
-            "r2",
-            null,
-            null
-        ]
-    },
-    {
-        "index": 99,
-        "name": "jz",
-        "args": [
-            null,
-            null,
-            null,
-            "103"
-        ]
-    },
-    {
-        "index": 100,
-        "name": "store",
-        "args": [
-            "r0",
-            null,
-            null,
-            "r1"
-        ]
-    },
-    {
-        "index": 101,
-        "name": "inc",
-        "args": [
-            "r1",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 102,
-        "name": "jmp",
-        "args": [
-            null,
-            null,
-            null,
-            "97"
-        ]
-    },
-    {
-        "index": 103,
-        "name": "ld",
-        "args": [
-            "rr",
-            null,
-            null,
-            "sp"
-        ]
-    },
-    {
-        "index": 104,
-        "name": "inc",
-        "args": [
-            "sp",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 105,
-        "name": "inc",
-        "args": [
-            "rr",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 106,
-        "name": "inc",
-        "args": [
-            "rr",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 107,
-        "name": "jmp",
-        "args": [
-            null,
-            null,
-            null,
-            "rr"
-        ]
-    },
-    {
-        "index": 108,
-        "name": "li",
-        "args": [
-            "r2",
-            null,
-            null,
-            "0"
-        ]
-    },
-    {
-        "index": 109,
-        "name": "ld",
-        "args": [
-            "r0",
-            null,
-            null,
-            "r1"
-        ]
-    },
-    {
-        "index": 110,
-        "name": "cmp",
-        "args": [
-            "r0",
-            "r2",
-            null,
-            null
-        ]
-    },
-    {
-        "index": 111,
-        "name": "jz",
-        "args": [
-            null,
-            null,
-            null,
-            "115"
-        ]
-    },
-    {
-        "index": 112,
-        "name": "output",
-        "args": [
-            "r0",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 113,
-        "name": "inc",
-        "args": [
-            "r1",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 114,
-        "name": "jmp",
-        "args": [
-            null,
-            null,
-            null,
-            "109"
-        ]
-    },
-    {
-        "index": 115,
-        "name": "ld",
-        "args": [
-            "rr",
-            null,
-            null,
-            "sp"
-        ]
-    },
-    {
-        "index": 116,
-        "name": "inc",
-        "args": [
-            "sp",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 117,
-        "name": "inc",
-        "args": [
-            "rr",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 118,
-        "name": "inc",
-        "args": [
-            "rr",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 119,
-        "name": "jmp",
-        "args": [
-            null,
-            null,
-            null,
-            "rr"
-        ]
-    },
-    {
-        "index": 120,
-        "name": "li",
-        "args": [
-            "r0",
-            null,
-            null,
-            "10"
-        ]
-    },
-    {
-        "index": 121,
-        "name": "output",
-        "args": [
-            "r0",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 122,
-        "name": "ld",
-        "args": [
-            "rr",
-            null,
-            null,
-            "sp"
-        ]
-    },
-    {
-        "index": 123,
-        "name": "inc",
-        "args": [
-            "sp",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 124,
-        "name": "inc",
-        "args": [
-            "rr",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 125,
-        "name": "inc",
-        "args": [
-            "rr",
-            null,
-            null,
-            null
-        ]
-    },
-    {
-        "index": 126,
-        "name": "jmp",
-        "args": [
-            null,
-            null,
-            null,
-            "rr"
-        ]
-    }
-]
+[{"index": 0, "name": "jmp", "args": [null, null, null, "73"]},
+ {"index": 1, "name": "input_port", "args": [0]},
+ {"index": 2, "name": "output_port", "args": [0]},
+ {"index": 3, "name": "username", "args": [0]},
+ {"index": 4, "name": "username", "args": [0]},
+ {"index": 5, "name": "username", "args": [0]},
+ {"index": 6, "name": "username", "args": [0]},
+ {"index": 7, "name": "username", "args": [0]},
+ {"index": 8, "name": "username", "args": [0]},
+ {"index": 9, "name": "username", "args": [0]},
+ {"index": 10, "name": "username", "args": [0]},
+ {"index": 11, "name": "username", "args": [0]},
+ {"index": 12, "name": "username", "args": [0]},
+ {"index": 13, "name": "username", "args": [0]},
+ {"index": 14, "name": "username", "args": [0]},
+ {"index": 15, "name": "username", "args": [0]},
+ {"index": 16, "name": "username", "args": [0]},
+ {"index": 17, "name": "username", "args": [0]},
+ {"index": 18, "name": "username", "args": [0]},
+ {"index": 19, "name": "username", "args": [0]},
+ {"index": 20, "name": "username", "args": [0]},
+ {"index": 21, "name": "username", "args": [0]},
+ {"index": 22, "name": "username", "args": [0]},
+ {"index": 23, "name": "username", "args": [0]},
+ {"index": 24, "name": "username", "args": [0]},
+ {"index": 25, "name": "username", "args": [0]},
+ {"index": 26, "name": "username", "args": [0]},
+ {"index": 27, "name": "username", "args": [0]},
+ {"index": 28, "name": "username", "args": [0]},
+ {"index": 29, "name": "username", "args": [0]},
+ {"index": 30, "name": "username", "args": [0]},
+ {"index": 31, "name": "username", "args": [0]},
+ {"index": 32, "name": "username", "args": [0]},
+ {"index": 33, "name": "username", "args": [0]},
+ {"index": 34, "name": "username", "args": [0]},
+ {"index": 35, "name": "username", "args": [0]},
+ {"index": 36, "name": "username", "args": [0]},
+ {"index": 37, "name": "username", "args": [0]},
+ {"index": 38, "name": "username", "args": [0]},
+ {"index": 39, "name": "username", "args": [0]},
+ {"index": 40, "name": "username", "args": [0]},
+ {"index": 41, "name": "username", "args": [0]},
+ {"index": 42, "name": "username", "args": [0]},
+ {"index": 43, "name": "request", "args": [87]},
+ {"index": 44, "name": "request", "args": [104]},
+ {"index": 45, "name": "request", "args": [97]},
+ {"index": 46, "name": "request", "args": [116]},
+ {"index": 47, "name": "request", "args": [32]},
+ {"index": 48, "name": "request", "args": [105]},
+ {"index": 49, "name": "request", "args": [115]},
+ {"index": 50, "name": "request", "args": [32]},
+ {"index": 51, "name": "request", "args": [121]},
+ {"index": 52, "name": "request", "args": [111]},
+ {"index": 53, "name": "request", "args": [117]},
+ {"index": 54, "name": "request", "args": [114]},
+ {"index": 55, "name": "request", "args": [32]},
+ {"index": 56, "name": "request", "args": [110]},
+ {"index": 57, "name": "request", "args": [97]},
+ {"index": 58, "name": "request", "args": [109]},
+ {"index": 59, "name": "request", "args": [101]},
+ {"index": 60, "name": "request", "args": [63]},
+ {"index": 61, "name": "request", "args": [0]},
+ {"index": 62, "name": "greeting", "args": [72]},
+ {"index": 63, "name": "greeting", "args": [101]},
+ {"index": 64, "name": "greeting", "args": [108]},
+ {"index": 65, "name": "greeting", "args": [108]},
+ {"index": 66, "name": "greeting", "args": [111]},
+ {"index": 67, "name": "greeting", "args": [44]},
+ {"index": 68, "name": "greeting", "args": [32]},
+ {"index": 69, "name": "greeting", "args": [0]},
+ {"index": 70, "name": "username_ptr", "args": [3]},
+ {"index": 71, "name": "request_ptr", "args": [43]},
+ {"index": 72, "name": "greeting_ptr", "args": [62]},
+ {"index": 73, "name": "li", "args": ["r1", null, null, "43"]},
+ {"index": 74, "name": "dec", "args": ["sp", null, null, null]},
+ {"index": 75, "name": "store", "args": ["ip", null, null, "sp"]},
+ {"index": 76, "name": "jmp", "args": [null, null, null, "108"]},
+ {"index": 77, "name": "dec", "args": ["sp", null, null, null]},
+ {"index": 78, "name": "store", "args": ["ip", null, null, "sp"]},
+ {"index": 79, "name": "jmp", "args": [null, null, null, "120"]},
+ {"index": 80, "name": "dec", "args": ["sp", null, null, null]},
+ {"index": 81, "name": "store", "args": ["ip", null, null, "sp"]},
+ {"index": 82, "name": "jmp", "args": [null, null, null, "95"]},
+ {"index": 83, "name": "li", "args": ["r1", null, null, "62"]},
+ {"index": 84, "name": "dec", "args": ["sp", null, null, null]},
+ {"index": 85, "name": "store", "args": ["ip", null, null, "sp"]},
+ {"index": 86, "name": "jmp", "args": [null, null, null, "108"]},
+ {"index": 87, "name": "li", "args": ["r1", null, null, "3"]},
+ {"index": 88, "name": "dec", "args": ["sp", null, null, null]},
+ {"index": 89, "name": "store", "args": ["ip", null, null, "sp"]},
+ {"index": 90, "name": "jmp", "args": [null, null, null, "108"]},
+ {"index": 91, "name": "dec", "args": ["sp", null, null, null]},
+ {"index": 92, "name": "store", "args": ["ip", null, null, "sp"]},
+ {"index": 93, "name": "jmp", "args": [null, null, null, "120"]},
+ {"index": 94, "name": "halt", "args": [null, null, null, null]},
+ {"index": 95, "name": "li", "args": ["r1", null, null, "3"]},
+ {"index": 96, "name": "li", "args": ["r2", null, null, "0"]},
+ {"index": 97, "name": "input", "args": ["r0", null, null, null]},
+ {"index": 98, "name": "cmp", "args": ["r0", "r2", null, null]},
+ {"index": 99, "name": "jz", "args": [null, null, null, "103"]},
+ {"index": 100, "name": "store", "args": ["r0", null, null, "r1"]},
+ {"index": 101, "name": "inc", "args": ["r1", null, null, null]},
+ {"index": 102, "name": "jmp", "args": [null, null, null, "97"]},
+ {"index": 103, "name": "ld", "args": ["rr", null, null, "sp"]},
+ {"index": 104, "name": "inc", "args": ["sp", null, null, null]},
+ {"index": 105, "name": "inc", "args": ["rr", null, null, null]},
+ {"index": 106, "name": "inc", "args": ["rr", null, null, null]},
+ {"index": 107, "name": "jmp", "args": [null, null, null, "rr"]},
+ {"index": 108, "name": "li", "args": ["r2", null, null, "0"]},
+ {"index": 109, "name": "ld", "args": ["r0", null, null, "r1"]},
+ {"index": 110, "name": "cmp", "args": ["r0", "r2", null, null]},
+ {"index": 111, "name": "jz", "args": [null, null, null, "115"]},
+ {"index": 112, "name": "output", "args": ["r0", null, null, null]},
+ {"index": 113, "name": "inc", "args": ["r1", null, null, null]},
+ {"index": 114, "name": "jmp", "args": [null, null, null, "109"]},
+ {"index": 115, "name": "ld", "args": ["rr", null, null, "sp"]},
+ {"index": 116, "name": "inc", "args": ["sp", null, null, null]},
+ {"index": 117, "name": "inc", "args": ["rr", null, null, null]},
+ {"index": 118, "name": "inc", "args": ["rr", null, null, null]},
+ {"index": 119, "name": "jmp", "args": [null, null, null, "rr"]},
+ {"index": 120, "name": "li", "args": ["r0", null, null, "10"]},
+ {"index": 121, "name": "output", "args": ["r0", null, null, null]},
+ {"index": 122, "name": "ld", "args": ["rr", null, null, "sp"]},
+ {"index": 123, "name": "inc", "args": ["sp", null, null, null]},
+ {"index": 124, "name": "inc", "args": ["rr", null, null, null]},
+ {"index": 125, "name": "inc", "args": ["rr", null, null, null]},
+ {"index": 126, "name": "jmp", "args": [null, null, null, "rr"]}]

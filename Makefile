@@ -24,6 +24,8 @@ JSON_HELLO = $(CODE_DIR)/hello_code.json
 JSON_PROB2 = $(CODE_DIR)/prob2_code.json
 JSON_ALG = $(CODE_DIR)/alg_code.json
 
+# translate and run:
+
 translate_all: translate_cat translate_hello_username translate_hello translate_prob2 translate_alg
 
 run_all: run_cat run_hello_username run_hello run_prob2 run_alg
@@ -61,4 +63,22 @@ run_alg:
 clean:
 	rm -f $(JSON_FILES)
 
-.PHONY: translate_all run_all translate_cat translate_hello_username translate_hello translate_prob2 translate_alg run_cat run_hello_username run_hello run_prob2 run_alg clean
+
+# poetry:
+
+format:
+	poetry run ruff format ./model
+
+lint:
+	poetry run ruff check ./model
+
+test:
+	poetry run pytest -v
+
+test-update-golden:
+	poetry run pytest ./model -v --update-goldens
+
+
+.PHONY: translate_all run_all translate_cat translate_hello_username \
+		translate_hello translate_prob2 translate_alg run_cat \
+		run_hello_username run_hello run_prob2 run_alg clean

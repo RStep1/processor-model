@@ -259,6 +259,8 @@ class ControlUnit:
         self.data_path.signal_latch_register(register)
         self.tick()
 
+        logging.debug("input: %s", repr(symbol))
+
     def execute_output(self, _, args):
         self.data_path.main_bus = OUTPUT_PORT_ADDRESS
         self.data_path.signal_latch_ar()
@@ -271,6 +273,8 @@ class ControlUnit:
 
         symbol = chr(self.memory[OUTPUT_PORT_ADDRESS]["args"][0])
         self.data_path.output_buffer.append(symbol)
+
+        logging.debug("output: %s << %s", repr("".join(self.data_path.output_buffer)), repr(symbol))
 
     def tick(self):
         self._tick += 1
@@ -340,13 +344,15 @@ class ControlUnit:
         self.tick()
 
     def __repr__(self):
-        state_repr = "TICK: {:4} IP: {:3} AR: {:4} SP: {:3} RR {:3} GPR: {} MEM_OUT: {}".format(
+        state_repr = "TICK: {:4} IP: {:3} AR: {:4} SP: {:3} RR {:3} GPR: {} FLAGS: Z={} N={} MEM_OUT: {}".format(
             self._tick,
             self.data_path.ip,
             self.data_path.ar,
             self.data_path.sp,
             self.data_path.rr,
             self.data_path.registers,
+            int(self.data_path.alu.z_flag),
+            int(self.data_path.alu.n_flag),
             get_cell_value(self.data_path.memory[self.data_path.ar]),
         )
 

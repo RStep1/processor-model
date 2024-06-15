@@ -232,9 +232,7 @@ def translate(source):
     labels, code = translate_section_text_stage_1(section_text, section_text_address, code)
     code = translate_section_text_stage_2(labels, variables, code, section_text_address)
 
-    json_code = json.dumps(code, indent=4)
-
-    return json_code, section_text_address
+    return code, section_text_address
 
 
 def main(source, target):
@@ -245,7 +243,7 @@ def main(source, target):
     code, section_text_address = translate(source)
 
     write_code(target, code)
-    print("source LoC:", len(source.split("\n")), "code instr:", len(code.split("{")) - section_text_address)
+    print("source LoC:", len(source.split("\n")), "code instr:", len(code) - section_text_address + 1)
 
 
 if __name__ == "__main__":

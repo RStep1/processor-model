@@ -78,7 +78,7 @@ register ::= "r" { <any of "0-9"> }-
 
 integer ::= [ "-" ] { <any of "0-9"> }-
 
-address ::= "*" { <any of "0-9"> }
+address ::= { <any of "0-9"> }
 
 label_name ::= <any of "a-zA-Z_"> { <any of "a-zA-Z0-9_"> }
 
